@@ -8,4 +8,5 @@
 7. 更新远程仓库到本地  git pull
 8. 推送到远程仓库  git push
 9. git reset HEAD^ 撤销HEAD提交
+
 10. commit的时候编辑步骤 i 输入提交说明———— esc退出 ————shift+;————wq保存退出
