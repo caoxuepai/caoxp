@@ -1,18 +1,13 @@
 <template>
   <div id="app">
   	<el-container>
-  		
   		<aslide></aslide>
-  		<el-container>
-  			<Header></Header>
-  		</el-container>
+			<router-view></router-view>
   	</el-container>
-    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Header from '@/components/header.vue'
 import Aslide from '@/components/aslide.vue'
 	import Vue from 'vue';
 	import{
@@ -22,7 +17,7 @@ import Aslide from '@/components/aslide.vue'
 	Vue.use(Container);
 
 export default {
-  components: {Header,Aslide}
+  components: {Aslide}
 }
 </script>
 

@@ -1,9 +1,12 @@
 <template>
 	<el-aside width="240px" style="background-color:rgba(51,55,68,1)">
-		<el-menu :default-openeds="[]">
-			<el-submenu index='1'>
-				<template slot="title">导航一</template>
-			</el-submenu>
+		<div class="log">
+			中旅智能平台
+		</div>
+		<el-menu :default-openeds="[]" router>
+			<el-menu-item router index="/home">
+    			<template slot="title">首页</template>
+		    </el-menu-item>
 			<el-submenu index='2'>
 				<template slot="title">导航一</template>
 			</el-submenu>
@@ -19,6 +22,7 @@
 		Dropdown,
 		Submenu,
 		Menu,
+		MenuItem,
 		Aside,
 		Container,
 		Header,
@@ -28,6 +32,7 @@
 	Vue.use(Dropdown);
 	Vue.use(Submenu);
 	Vue.use(Menu);
+	Vue.use(MenuItem);
 	Vue.use(Aside);
 	Vue.use(Container);
 	Vue.use(Header);
@@ -37,3 +42,9 @@
 		
 	}
 </script>
+<style type="text/css">
+	.log{
+		height:56px;
+
+	}
+</style>

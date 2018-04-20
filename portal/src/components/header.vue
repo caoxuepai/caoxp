@@ -1,5 +1,5 @@
 <template>
-		<el-header style='text-align:right'>
+		<div style='text-align:right'>
 			<el-dropdown>
 				<i class="el-icon-setting" style="margin-right:15px;"></i>
 				<el-dropdown-menu slot="dropdown">
@@ -7,7 +7,7 @@
 				</el-dropdown-menu>
 			</el-dropdown>
 			<span>admin</span>
-		</el-header>
+		</div>
 </template>
 <script>
 	import Vue from 'vue';
