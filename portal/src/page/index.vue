@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <div>index page</div>
+    <el-main>
     <ul>
         <li v-for="item in news" :key="item.id">
           <router-link :to="'/content/' + item.id">
@@ -9,10 +8,18 @@
         </li>
     </ul>
     <pagination></pagination>
-  </div>
+  </el-main>
 </template>
 <script>
   import pagination from '@/components/pagination.vue'
+  import Vue from 'vue';
+  import{
+    Container,
+    Main,
+  } from 'element-ui';
+  Vue.use(Container);
+  Vue.use(Main);
+
   export default {
     data () {
       return {
