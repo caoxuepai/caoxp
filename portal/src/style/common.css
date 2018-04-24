@@ -1,9 +1,14 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
 body,ol,ul,h1,h2,h3,h4,h5,h6,p,th,td,dl,dd,form,fieldset,legend,input,textarea,select {
   margin: 0;
   padding: 0;
 }
 body {
-  font: 14px/1.5 "Helvetica Neue",Helvetica,Arial,"Microsoft Yahei","Hiragino Sans GB","Heiti SC","WenQuanYi Micro Hei",sans-serif;
+  font: 14px/1.5 "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
   background: #f7f7f7;
   -webkit-text-size-adjust: 100%;
 }
@@ -35,4 +40,49 @@ table {
 }
 p {
   word-wrap: break-word;
+}
+
+
+table button.el-button {
+  color: #ffffff;
+  background-color: #666666;
+  border: none;
+  padding: 7px 5px;
+}
+table button.el-button:active, table button.el-button:hover, table button.el-button:focus {
+  color: #ffffff;
+  border: none;
+}
+/*蓝色按钮*/
+table button.el-button.blue {
+  background-color: #4ca5ff;
+}
+table button.el-button.blue:hover {
+  background-color: #3880f5;
+}
+/*绿色按钮*/
+table button.el-button.green {
+  background-color: #45ad7a;
+}
+table button.el-button.green:hover {
+  background-color: #129956;
+}
+/*红色按钮*/
+table button.el-button.red {
+  background-color: #f08166;
+}
+table button.el-button.red:hover {
+  background-color: #e34a25;
+}
+/*灰色按钮*/
+table button.el-button.grey {
+  background-color: #85a6c4;
+}
+table button.el-button.grey:hover {
+  background-color: #598bb8;
+}
+
+table button i.iconfont {
+  font-size: 12px;
+  margin: 0 3px;
 }

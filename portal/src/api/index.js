@@ -1,67 +1,88 @@
-const root = '';
-const axios = require('axios');
+import axios from 'axios'
+import store from '../store/store'
+import * as types from '../store/types'
+import router from '../router'
+import {Message} from 'element-ui'
 
-function toType (obj) {
-  return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
-}
+axios.defaults.baseURL = 'http://47.93.192.144:8081/china-travel';
+// axios.defaults.baseURL = 'http://192.168.100.182:8081/china-travel';
 
-function filterNull (o) {
-  for (var key in o) {
-    if (o[key] === null) {
-      delete o[key]
+// http request 拦截器
+axios.interceptors.request.use(
+  config => {
+    if (store.state.token) {
+      config.headers.Authorization = `${store.state.token}`;
     }
-    if (toType(o[key]) === 'string') {
-      o[key] = o[key].trim()
-    } else if (toType(o[key]) === 'object') {
-      o[key] = filterNull(o[key])
-    } else if (toType(o[key]) === 'array') {
-      o[key] = filterNull(o[key])
-    }
-  }
-  return o
-}
-
-function apiAxios (method, url, params) {
-  if (params) {
-    params = filterNull(params);
-  }
-  return new Promise((resolve, reject) => {
-    axios({
-      method: method,
-      url: url,
-      baseURL: root,
-      data: method === 'POST' || method === 'PUT' ? params : null,
-      params: method === 'GET' || method === 'DELETE' ? params : null,
-      withCredentials: false
-    }).then((res)=>{
-      // console.log(resolve);
-      if(res.status === 200) {
-        resolve(res.data);
+    config.headers.ContentType = `application/x-www-form-urlencoded;charset=UTF-8`;
+    config.transformRequest = [function (data) {
+      let ret = '';
+      for (let it in data) {
+        ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
       }
-      /*if(res.code === 0) {
-        resolve(res.data);
-      } else {
-        if(res.msg) {
-          alert(res.msg);
-        } else {
-          alert('错误');
-        }
-      }*/
-    }, (err) => {
-      reject(err);
-    }).catch((error) => {
-      reject(error);
-    })
-  })
-}
-
-// 返回在vue模板中的调用接口
-export default {
-  get: function (url, params) {
-    return apiAxios('GET', url, params);
+      return ret
+    }];
+    return config;
   },
-  post: function (url, params) {
-    return apiAxios('POST', url, params);
+  err => {
+    return Promise.reject(err);
   }
-}
+);
 
+// http response 拦截器
+axios.interceptors.response.use(
+  response => {
+    switch (response.data.code) {
+      case 0:
+        return response.data;
+        break;
+      case 10001:
+        // token失效，登录过期，清除token信息并跳转到登录页面
+        Message.warning('登录过期');
+        store.commit(types.LOGOUT);
+        router.replace({
+          path: 'login',
+          query: {redirect: router.currentRoute.fullPath}
+        });
+        return response.data;
+        break;
+      case 10002:
+        // 无操作权限，清除token信息并跳转到登录页面
+        Message.warning('无操作权限');
+        store.commit(types.LOGOUT);
+        router.replace({
+          path: 'login',
+          query: {redirect: router.currentRoute.fullPath}
+        });
+        return response.data;
+        break;
+      case 10003:
+        // 账号密码错误
+        Message.warning('账号或密码错误，请重新登录');
+        store.commit(types.LOGOUT);
+        router.replace({
+          path: 'login',
+          query: {redirect: router.currentRoute.fullPath}
+        });
+        return response.data;
+        break;
+      default:
+        break;
+    }
+  },
+  error => {
+    if (error.response) {
+      switch (error.response.status) {
+        case 401:
+          // 401 清除token信息并跳转到登录页面
+          store.commit(types.LOGOUT);
+          router.replace({
+            path: 'login',
+            query: {redirect: router.currentRoute.fullPath}
+          });
+      }
+    }
+    return Promise.reject(error.response.data)
+  }
+);
+
+export default axios;

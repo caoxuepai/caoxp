@@ -1,13 +1,11 @@
 <template>
   <div>
     <el-pagination
-      @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="currentPage4"
-      :page-sizes="[100, 200, 300, 400]"
+      :current-page="currentPage"
       :page-size="100"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
+      :page-count="pageCount"
+      layout="prev, pager, next, jumper"
       :background="true">
     </el-pagination>
   </div>
@@ -20,28 +18,26 @@
   export default {
     data () {
       return {
-        currentPage4: 4,
-        pageNow: 2,
-        page: []
       }
     },
     props: {
       pageCount: {
         type: Number,
-        default: 10
+        default: 1
+      },
+      currentPage: {
+        type: Number,
+        default: 1
       }
     },
     created () {
-      let pageArr = [];
+      /*let pageArr = [];
       for(let i=1; i <= this.pageCount; i++) {
         pageArr.push(i);
       }
-      this.page = pageArr;
+      this.page = pageArr;*/
     },
     methods: {
-      handleSizeChange (val) {
-        console.log('每页 ${val} 条');
-      },
       handleCurrentChange(val) {
         console.log(`当前页: ${val}`);
       }
