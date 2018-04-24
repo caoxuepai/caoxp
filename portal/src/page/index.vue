@@ -1,9 +1,9 @@
 <template>
     <div>
       <Nav :msg="navMsg"/></Nav>
-      <Dialog v-bind:show="show" v-on:titleChanged="zidingyi($event)"></Dialog>
+      <Dialog :centerDialogVisible="removeDialog" :cancel="cancel" :confirm="confirm"></Dialog>
     <el-container>
-    <grid-box :headers="tableHeaders" :operations="operations" :row-data="rowData" v-bind:show="show" v-on:titleChanged="zidingyi($event)"></grid-box>
+    <grid-box :headers="tableHeaders" :operations="operations" :row-data="rowData"></grid-box>
     </el-container>
     </div>
 </template>
@@ -41,20 +41,24 @@
           title: '删除',
           clickFn:(index, data) => {
             console.log('删除第'+index+'行');
-            this.$emit("titleChanged",true)
+            this.removeDialog=true
           }
         }],
         rowData: [
           {id: '1', name: 'Arice', age: 20},
           {id: '2', name: 'David', age: 50}
         ],
-        show:false,
+        removeDialog:false,
         navMsg:'首页'
       }
     },
     methods:{
-      zidingyi(msg){
-        this.show = msg;
+      cancel(){
+        this.removeDialog=false;
+      },
+      confirm(){
+        this.removeDialog=false;
+        
       }
     },
     created () {

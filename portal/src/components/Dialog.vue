@@ -1,9 +1,9 @@
 <template>
-	<el-dialog title="提示" :visible.sync="show" width="30%">
+	<el-dialog title="提示" :visible.sync="centerDialogVisible" width="30%" :before-close="cancel">
 		<span>内容</span>
 		<span slot="footer" class="dialog-footer">
-			<el-button @click="centerDialogVisible=false">取消</el-button>
-			<el-button type="primary" @click="centerDialogVisible=false">确定</el-button>
+			<el-button @click="cancel">取消</el-button>
+			<el-button type="primary" @click="confirm">确定</el-button>
 		</span>
 	</el-dialog>
 </template>
@@ -14,6 +14,24 @@
 	Vue.use(Dialog)
 	export default{
 		name:'Dialog',
-		props:['show']
+	    props:{
+	      centerDialogVisible:{
+	        type:Boolean,
+	        default:false
+	      },
+	      cancel:{
+	      	type:Function,
+	      	default:function(){
+	      		alert('默认函数 取消')
+	      	}
+	      },
+	      confirm:{
+	      	type:Function,
+	      	default:function(){
+	      		alert('默认函数 确认')
+	      	}
+	      }
+	    }
+	    
 	}
 </script>
