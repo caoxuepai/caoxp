@@ -1,7 +1,7 @@
 <template>
   <div class="login-bg">
     <div class="login-layer">
-      <div class="login-box demo-input-suffix">
+      <div class="login-box demo-input-suffix" @keyup.enter="submitLogin('loginForm')">
         <div class="login-logo">中旅智能平台</div>
         <div class="login-sign">Sign In</div>
         <el-form ref="loginForm" :model="loginForm" :rules="rules" label-position="right" status-icon size="medium" label-width="0">
@@ -80,9 +80,6 @@
           }
         });
       }
-    },
-    created() {
-        console.log(store.state.token);
     }
   }
 </script>

@@ -1,7 +1,7 @@
 <template>
     <div>
       <Nav :msg="navMsg"/></Nav>
-      <Dialog :centerDialogVisible="removeDialog" :cancel="cancel" :confirm="confirm"></Dialog>
+      <Dialog :centerDialogVisible="removeDialog" :dialog="dialog" @cancel="cancel" @confirm="confirm"></Dialog>
     <el-container>
     <grid-box :headers="tableHeaders" :operations="operations" :row-data="rowData"></grid-box>
     </el-container>
@@ -41,7 +41,12 @@
           title: '删除',
           clickFn:(index, data) => {
             console.log('删除第'+index+'行');
-            this.removeDialog=true
+            const _this = this;
+            this.removeDialog=true;
+            this.confirm = () => {
+              _this.removeDialog=false;
+              _this.rowData.splice(index,1);
+            }
           }
         }],
         rowData: [
@@ -49,16 +54,16 @@
           {id: '2', name: 'David', age: 50}
         ],
         removeDialog:false,
-        navMsg:'首页'
+        navMsg:'首页',
+        dialog:'确定要删除吗？'
       }
     },
     methods:{
       cancel(){
-        this.removeDialog=false;
+        this.removeDialog = false;
       },
       confirm(){
         this.removeDialog=false;
-        
       }
     },
     created () {

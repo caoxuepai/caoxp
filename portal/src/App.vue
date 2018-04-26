@@ -1,7 +1,7 @@
 <template>
   <div id="app" style="width: 100%;min-height: 100%;height:100%">
   	<el-container style="height:100%" v-if="!login">
-      <el-aside width="240px"><aslide-box></aslide-box></el-aside>
+      <el-aside width="240px"><aside-box></aside-box></el-aside>
       <el-container>
         <el-header><header-box></header-box></el-header>
         <el-main>
@@ -16,7 +16,7 @@
 </template>
 
 <script>
-  import AslideBox from '@/components/aslide.vue'
+  import AsideBox from '@/components/aside.vue'
   import HeaderBox from '@/components/header.vue'
 	import Vue from 'vue';
 	import {Container} from 'element-ui';
@@ -30,9 +30,8 @@
         login: null
       }
     },
-    components: {AslideBox, HeaderBox},
+    components: {AsideBox, HeaderBox},
     updated() {
-      console.log(this.$store.state.isLogin);
       this.login = this.$store.state.isLogin
     }
   }

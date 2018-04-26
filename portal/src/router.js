@@ -31,7 +31,6 @@ const routers = new Router({
 })
 // 页面刷新时，重新赋值token
 if (window.localStorage.getItem('token')) {
-  // console.log(store.state.isLogin);
   store.commit(types.LOGIN, {token: window.localStorage.getItem('token')});
 }
 
