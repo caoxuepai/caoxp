@@ -1,0 +1,35 @@
+/*-------reset---------*/
+html, body, div, span, h1, h2, h3, h4, h5, h6, em, img, strong, sub, sup, tt,dd, dl, dt, form, label, table, caption, tbody, tfoot, thead, tr, th, td,ul,li,p,a{ margin: 0; padding: 0;}
+*{padding: 0;margin: 0;}
+html,body{min-height:100%;min-height:100vh;width:100%;overflow-x:hidden}
+body{font-size:14px; font-family:"微软雅黑",Arial, Helvetica, sans-serif;color:#363636;background:#f5f5f9;position:relative}
+input,select,textarea{ vertical-align:middle;}
+img{ border:0;}
+ul,li{ list-style-type:none;}
+a:link,a:visited{
+text-decoration:none;color:inherit}
+a:hover{text-decoration:none;}
+.overhide{overflow:hidden;text-indent:-100em; }
+.clearfix:after {clear: both;content: ' ';display: block;font-size: 0;line-height: 0;visibility: hidden;width: 0;height: 0;}
+.clearfix{zoom:1}
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder { 
+color: #999; font-size:14px;
+} 
+input:-moz-placeholder, textarea:-moz-placeholder { 
+color: #999; font-size: 14px;
+} 
+input::-moz-placeholder, textarea::-moz-placeholder { 
+color: #999; font-size: 14px;
+} 
+input:-ms-input-placeholder, textarea:-ms-input-placeholder { 
+color: #999; font-size: 14px;
+}
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {background-color: #fff;-webkit-box-shadow: 0 0 0px 1000px white inset;}
+input:focus{background:#fff;}
+input,button{outline: none;}
+
+.clearfix:after {
+    display: block;
+    content: "";
+    clear: both;
+}
