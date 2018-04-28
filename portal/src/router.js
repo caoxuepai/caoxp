@@ -5,6 +5,8 @@ import Router from 'vue-router'
 import Index from '@/page/index'
 import Login from '@/page/login/login'
 import Modify from '@/page/modify/modify'
+import Supplier from '@/page/suppliers/suppliers'
+import Add from '@/page/suppliers/add/add'
 
 Vue.use(Router)
 
@@ -26,6 +28,19 @@ const routers = new Router({
         requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
       },
       component: Modify
+    },{
+      path:'/suppliers',
+      meta:{
+        requireAuth:true,
+      },
+      component:Supplier
+    },
+    {
+      path:'/suppliers/add',
+      meta: {
+        requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+      },
+      component:Add
     }
   ]
 })

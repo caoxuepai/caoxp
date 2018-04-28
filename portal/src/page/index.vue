@@ -1,6 +1,6 @@
 <template>
     <div>
-      <Nav :msg="navMsg"/></Nav>
+      <Nav ></Nav>
       <Dialog :centerDialogVisible="removeDialog" :dialog="dialog" @cancel="cancel" @confirm="confirm"></Dialog>
     <el-container>
     <grid-box :headers="tableHeaders" :operations="operations" :row-data="rowData"></grid-box>
@@ -14,12 +14,22 @@
   import Nav from '@/components/nav.vue'
   import Dialog from '@/components/Dialog.vue'
   import{Container, Main, Aside, Header} from 'element-ui';
+  import store from '../store/store.js';
+  import * as types from '../store/types.js'
   Vue.use(Container);
   Vue.use(Main);
   Vue.use(Aside);
   Vue.use(Header);
 
   export default {
+    created(){
+      console.log(this.$store.state.navList,222 )
+      store.commit(types.NAVLIST,[{
+        navMsg:'首页',
+        navclassName: "icon iconfont icon-shouye"
+      }]);
+
+    },
     data () {
       return {
         tableHeaders: [
@@ -54,8 +64,8 @@
           {id: '2', name: 'David', age: 50}
         ],
         removeDialog:false,
-        navMsg:'首页',
-        dialog:'确定要删除吗？'
+        dialog:'确定要删除吗？',
+
       }
     },
     methods:{
@@ -65,9 +75,6 @@
       confirm(){
         this.removeDialog=false;
       }
-    },
-    created () {
-
     },
     components: {GridBox,Nav,Dialog}
   }

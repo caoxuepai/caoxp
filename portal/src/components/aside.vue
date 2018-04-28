@@ -3,9 +3,12 @@
     <div class="log">
       中旅智能平台
     </div>
-    <el-menu :default-openeds="[]" router>
+    <el-menu :default-active="$route.path" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" router>
       <el-menu-item router index="/">
         <template slot="title"><i class="iconfont icon-shouye aside-icon"></i>首页</template>
+      </el-menu-item>
+      <el-menu-item index='/suppliers'>
+        <template slot="title"><i class="iconfont icon-gongyingshang aside-icon"></i>供应商管理</template>
       </el-menu-item>
       <el-submenu index='2'>
         <template slot="title"><i class="iconfont icon-dingdan aside-icon"></i>订单管理</template>
@@ -13,18 +16,16 @@
       <el-submenu index='3'>
         <template slot="title"><i class="iconfont icon-hexiao aside-icon"></i>订单核销</template>
       </el-submenu>
-      <el-submenu index='4'>
-        <template slot="title"><i class="iconfont icon-gongyingshang aside-icon"></i>供应商管理</template>
-      </el-submenu>
       <el-submenu index='5'>
         <template slot="title"><i class="iconfont icon-caiwuguanli aside-icon"></i>财务管理</template>
-      </el-submenu>
-      <el-submenu index='6'>
-        <template slot="title"><i class="iconfont icon-tuandui aside-icon"></i>团队管理</template>
       </el-submenu>
       <el-submenu index='7'>
         <template slot="title"><i class="iconfont icon-yonghuguanli aside-icon"></i>用户管理</template>
       </el-submenu>
+      <el-submenu index='6'>
+        <template slot="title"><i class="iconfont icon-tuandui aside-icon"></i>汇率管理</template>
+      </el-submenu>
+     
     </el-menu>
   </div>
 </template>
@@ -39,9 +40,16 @@
 	Vue.use(Container);
 	Vue.use(Header);
 	Vue.use(DropdownMenu);
-	Vue.use(DropdownItem)
+  Vue.use(DropdownItem)
 	export default{
-
+    methods: {
+      handleOpen(key, keyPath) {
+        console.log(key, keyPath,1);
+      },
+      handleClose(key, keyPath) {
+        console.log(key, keyPath,2);
+      }
+    }
 	}
 </script>
 <style type="text/css">
