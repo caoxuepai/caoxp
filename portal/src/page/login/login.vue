@@ -64,6 +64,7 @@
     },
     methods: {
       submitLogin(form) {
+        const that = this;
         this.$refs[form].validate((valid) => {
           if(valid) {
             axios.post('/login/ajaxLogin', {userName: this.loginForm.username, password: this.loginForm.password}).then((res)=>{
@@ -71,6 +72,8 @@
                 window.localStorage.setItem('token', res.data.token);
                 window.localStorage.setItem('roleCode',res.data.roleCode);
                 store.commit(types.ROLECODE,{roleCode:window.localStorage.getItem('roleCode')})
+                window.localStorage.setItem('username', that.loginForm.username);
+//                store.commit(types.ROLECODE,{roleCode:res.data.roleCode});
                 store.commit(types.LOGIN, {token: window.localStorage.getItem('token')});
                 if (res.data.roleCode=='admin') {
                     this.$router.push('/');

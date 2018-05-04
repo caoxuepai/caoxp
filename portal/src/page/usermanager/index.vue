@@ -1,9 +1,8 @@
 <template>
   <div>
     <Nav :count="count"></Nav>
-    <user-dialog :create="dialogCreate" :uuid="uuid" :visible="dialogVisible"></user-dialog>
-    <Dialog :centerDialogVisible="removeDialog" :dialog="dialog" @cancel="cancel" @confirm="confirm"></Dialog>
-    <el-button type="success" @click.prevent="addUser">添加</el-button>
+    <user-dialog></user-dialog>
+    <el-button type="success" style="margin-bottom: 15px;" size="medium" @click.prevent="addUser">添加</el-button>
     <el-container>
       <grid-box :headers="tableHeaders" :operations="operations" :row-data="rowData"></grid-box>
     </el-container>
@@ -15,85 +14,106 @@
   import axios from '@/api/index'
   import GridBox from '@/components/grid.vue'
   import Vue from 'vue';
-  import Dialog from '@/components/dialog.vue'
+//  import Dialog from '@/components/dialog.vue'
   import Nav from '@/components/nav.vue'
   import pagination from '@/components/pagination.vue'
+  import {event} from './event'
+  import {MessageBox, Message} from 'element-ui'
   export default {
     created(){
-      this.getOrder();
+      this.getUser();
+      const that = this;
+      event.$on('refreshUser', () => {
+        that.getUser();
+      })
     },
     data() {
       return {
         dialogCreate: false,
         uuid: '',
         dialogVisible: false,
+        editData: {},
         count:[
-          {navclassName:'icon iconfont icon-shouye',navMsg:'用户管理'},
+          {navclassName:'icon iconfont icon-yonghuguanli',navMsg:'用户管理'},
         ],
         tableHeaders: [
           {prop: 'userName', label: '用户名'},
-          {prop: 'roles', label: '角色'},
-          {prop: 'disabled', label: '状态'}
+          {prop: 'roleName', label: '角色'},
+          {prop: 'disabledText', label: '使用状态'}
         ],
         operations: [
           {
             className: 'blue',
-            title: '启用',
-            label:'启用',
+            title: '启用/禁用',
+            label:'',
+            icon: 'iconfont icon-buoumaotubiao32',
             clickFn: (index, data) => {
-                console.log(data);
-                console.log(index);
-                const _this = this;
-                this.removeDialog=true;
+              const disableText = data.disabled ? '启用' : '禁用';
+              const able = data.disabled ? 1 : 0;
+              MessageBox.confirm('确定'+disableText+'该用户吗？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消'
+              }).then(() => {
+                axios.post('/admin/user/abled', {uuid: data.uuid, able: able}).then((res)=>{
+                  if(res.code === 0) {
+                    Message.success('状态修改成功');
+                    event.$emit('refreshUser');
+                  } else {
+                    Message.error('状态修改失败');
+                  }
+                })
+              }).catch(() => {
+
+              })
             }
-          }, 
+          },
           {
-            className: 'blue',
+            className: 'red',
             title: '编辑',
-            label:' 编辑',
+            label: '',
+            icon: 'iconfont icon-edit2',
             clickFn:(index, data) => {
-              console.log('删除第'+index+'行');
-              const _this = this;
-              this.confirm = () => {
-              }
+              event.$emit('openDialog', {create: false, editData: data});
             }
           }
         ],
-        rowData: [],
+        rowData: [
+          {username: 'guo', role: 'admin', password: '******', disabled: '0', uuid: '1134556'},
+          {username: 'zhu', role: 'finance', password: '******', disabled: '1', uuid: '012587'},
+        ],
         removeDialog:false,
-        dialog:'确定要启用吗？',
-        page: {pageCount: 5, currentPage: 1}
+        page: {pageCount: 50, currentPage: 1}
       }
     },
     methods: {
-      cancel(){
-        this.removeDialog = false;
-      },
-      confirm(){
-        this.removeDialog=false;
-      },
       addUser() {
-        this.dialogVisible = true
+        event.$emit('openDialog', {create: true});
       },
       changePage(val) {
-        
-        
-        this.getOrder();
+        this.page.currentPage = val;
+        this.getUser();
       },
-      getOrder() {
+      getUser() {
         const that = this;
-        const pageCount = 1
-        axios.post('/admin/user/list/'+pageCount+'').then((res) => {
-          
-          that.rowData = [];
-          res.data.list.forEach((item, i) => {
-            item.index = i+1;
-            that.rowData.push(item);
+        axios.post('/admin/user/list/'+this.page.currentPage).then((res) => {
+            that.page.pageCount = res.data.pageCount;
+            that.rowData = [];
+            res.data.list.forEach((item, i) => {
+              item.index = i+1;
+              if(item.disabled === 1) {
+                item.disabledText = '不可用';
+              } else {
+                item.disabledText = '可用';
+              }
+              item.password = '******';
+              item.roleName = item.roles[0].name;
+              item.roleId = item.roles[0].id;
+              that.rowData.push(item);
           })
         })
       }
     },
-    components: {userDialog,GridBox,Nav,pagination,Dialog}
+    components: {userDialog,GridBox,Nav,pagination}
   }
 </script>
 <style>

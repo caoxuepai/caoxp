@@ -48,6 +48,7 @@ table button.el-button {
   background-color: #666666;
   border: none;
   padding: 7px 5px;
+  margin: 0 15px;
 }
 table button.el-button:active, table button.el-button:hover, table button.el-button:focus {
   color: #ffffff;

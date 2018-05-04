@@ -1,7 +1,7 @@
 <template>
   <div style="width: 240px;height: 100%;background-color: rgba(51, 55, 68, 1)">
     <div class="log">
-      中旅智能平台{{roleCode}}
+      中旅智能平台
     </div>
     <el-menu v-if='roleCode=="admin"' :default-active="$route.path" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" router>
       <el-menu-item router index="/">
@@ -11,7 +11,7 @@
         <template slot="title"><i class="iconfont icon-gongyingshang aside-icon"></i>供应商管理</template>
       </el-menu-item>
       <el-menu-item index='/exchangeRate'>
-        <template slot="title"><i class="iconfont icon-tuandui aside-icon"></i>汇率管理</template>
+        <template slot="title"><i class="iconfont icon-bizhonghuishuai aside-icon"></i>汇率管理</template>
       </el-menu-item>
       <el-menu-item index='/usermanager'>
         <template slot="title"><i class="iconfont icon-yonghuguanli aside-icon"></i>用户管理</template>
@@ -55,7 +55,7 @@
     },
     computed: {
       roleCode () {
-        return this.$store.state.roleCode  
+        return this.$store.state.roleCode
       }
     }
 	}

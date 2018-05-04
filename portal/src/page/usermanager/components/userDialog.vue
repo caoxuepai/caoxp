@@ -3,16 +3,16 @@
     <el-dialog :title="title" :visible.sync="visible" width="30%" style="min-width: 500px;" :before-close="cancel">
       <div>
         <el-form :model="formData" ref="form" status-icon :rules="rules">
-          <el-form-item label="用户名：" prop="username">
-            <el-input type="text" v-model="formData.username" :disabled="!create" auto-complete="off"></el-input>
+          <el-form-item label="用户名：" prop="userName">
+            <el-input type="text" v-model="formData.userName" :disabled="!create" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="密码：" prop="password">
             <el-input type="password" v-model="formData.password" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="角色：" prop="role">
-            <el-radio v-model="formData.role" label="admin">管理员</el-radio>
-            <el-radio v-model="formData.role" label="operator">OP</el-radio>
-            <el-radio v-model="formData.role" label="finance">财务</el-radio>
+          <el-form-item label="角色：" prop="roleId">
+            <el-radio v-model="formData.roleId" label="1">管理员</el-radio>
+            <el-radio v-model="formData.roleId" label="3">订单处理员</el-radio>
+            <el-radio v-model="formData.roleId" label="2">财务</el-radio>
           </el-form-item>
         </el-form>
       </div>
@@ -25,6 +25,8 @@
 </template>
 <script>
   import Vue from 'vue';
+  import axios from '@/api/index'
+  import {event} from '../event'
   import {Input, Form, FormItem, Button, Message, Radio} from 'element-ui';
   Vue.use(Input);
   Vue.use(Form);
@@ -51,32 +53,21 @@
       return {
         title: '',
         formData: {
-          username: '',
+          userName: '',
           password: '',
-          role: 'admin'
+          roleId: '1',
+          uuid: ''
         },
         rules: {
-          username: [
+          userName: [
             { validator: validateUserName, trigger: 'blur' }
           ],
           password: [
             { validator: validatePassword, trigger: 'blur' }
           ]
-        }
-      }
-    },
-//    props: ['create', 'uuid', 'visible'],
-    props: {
-      create: {
-        isRequired: true,
-        default: true
-      },
-      uuid: {
-        isRequired: false
-      },
-      visible: {
-        isRequired: true,
-        default: false
+        },
+        create: true,
+        visible: false
       }
     },
     components: {},
@@ -85,21 +76,71 @@
         this.visible = false;
       },
       confirm(form) {
+        const that = this;
         this.$refs[form].validate((valid) => {
           if(valid) {
-            console.log('用户名--' + this.formData.username + ', 密码--' + this.formData.password + ', 角色---' + this.formData.role);
+            if(this.create) { //  添加
+              axios.post('/admin/user/add', {userName: this.formData.userName, password: this.formData.password, roleId: this.formData.roleId}).then((res) => {
+                if(res.code === 0) {
+                  Message.success('用户添加成功');
+                  that.visible = false;
+                  event.$emit('refreshUser');
+                }
+              });
+            } else {
+              let editData = {};
+              if(this.formData.password === '******') {
+                editData = {
+                  uuid: this.formData.uuid,
+                  password: '',
+                  roleId: this.formData.roleId
+                }
+              } else {
+                editData = {
+                  uuid: this.formData.uuid,
+                  roleId: this.formData.roleId,
+                  password: this.formData.password
+                }
+              }
+              axios.post('/admin/user/update', editData).then((res) => {
+                if(res.code === 0) {
+                  Message.success('用户修改成功');
+                  that.visible = false;
+                  event.$emit('refreshUser');
+                }
+              })
+            }
+            console.log('用户名--' + this.formData.userName + ', 密码--' + this.formData.password + ', 角色---' + this.formData.role);
           } else {
             return false;
           }
         })
       }
     },
-    created() {
-      if(this.create) {
-        this.title = '新增用户';
-      } else {
-        this.title = '编辑用户';
-      }
+    mounted() {
+      event.$on('openDialog', (data) => {
+        if(data.create) {
+          this.title = '新增用户';
+          this.create = true;
+          this.visible = true;
+          this.formData = {
+            userName: '',
+            password: '',
+            roleId: '1',
+            uuid: ''
+          };
+        } else {
+          this.title = '编辑用户';
+          this.create = false;
+          console.log(data.editData);
+          this.formData.userName = data.editData.userName;
+          this.formData.password = data.editData.password;
+          this.formData.roleId = data.editData.roleId.toString();
+          this.formData.uuid = data.editData.uuid;
+          console.log(this.formData.roleId);
+          this.visible = true;
+        }
+      });
     }
   }
 </script>

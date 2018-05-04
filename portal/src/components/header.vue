@@ -2,10 +2,10 @@
   <div class="header-section">
     <el-dropdown @command="handleCommand">
       <span class="el-dropdown-link">
-        <i class="iconfont icon-yonghu header-icon" style="font-size: 18px;"></i>admin
+        <i class="iconfont icon-yonghu header-icon" style="font-size: 18px;"></i>{{ username }}
       </span>
       <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item command="repwd"><i class="iconfont header-icon icon-xiugaimima"></i>修改密码</el-dropdown-item>
+        <el-dropdown-item command="repwd" v-if="roleCode != 'admin'"><i class="iconfont header-icon icon-xiugaimima"></i>修改密码</el-dropdown-item>
         <el-dropdown-item command="logout"><i class="iconfont icon-zhuxiao header-icon"></i>注销登录</el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
@@ -23,6 +23,11 @@
 	Vue.use(DropdownMenu);
 	Vue.use(DropdownItem)
 	export default{
+	  data() {
+	    return {
+	      username: window.localStorage.getItem('username')
+      }
+    },
     methods: {
       handleCommand(c) {
         switch(c) {
@@ -41,6 +46,11 @@
           default:
             break;
         }
+      }
+    },
+    computed: {
+      roleCode () {
+        return this.$store.state.roleCode
       }
     }
 	}

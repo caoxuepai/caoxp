@@ -86,6 +86,7 @@ const routers = new Router({
 })
 // 页面刷新时，重新赋值token
 if (window.localStorage.getItem('token')) {
+  store.commit(types.ROLECODE,{roleCode:window.localStorage.getItem('roleCode')})
   store.commit(types.LOGIN, {token: window.localStorage.getItem('token')});
 }
 

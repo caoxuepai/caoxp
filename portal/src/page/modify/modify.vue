@@ -10,6 +10,9 @@
           <el-form-item label="新密码" prop="newPass">
             <el-input type="password" v-model="ruleForm2.newPass" auto-complete="off" placeholder="请输入新密码"></el-input>
           </el-form-item>
+          <el-form-item label="重复新密码" prop="repeatNewPass">
+            <el-input type="password" v-model="ruleForm2.repeatNewPass" auto-complete="off" placeholder="请输入新密码"></el-input>
+          </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="submitForm('ruleForm2')">提交</el-button>
             <el-button @click="resetForm('ruleForm2')">重置</el-button>
@@ -33,27 +36,36 @@
  	Vue.use(Main);
   export default {
     data() {
-      var validatePass = (rule, value, callback) => {
+      const validatePass = (rule, value, callback) => {
         if (value === '') {
           callback(new Error('请输入旧密码'));
         } else {
-          if (this.ruleForm2.newPass !== '') {
-            this.$refs.ruleForm2.validateField('newPass');
-          }
           callback();
         }
       };
-      var validatePass2 = (rule, value, callback) => {
+      const validatePass2 = (rule, value, callback) => {
         if (value === '') {
           callback(new Error('请输入新密码'));
         } else {
           callback();
         }
       };
+      const validateNewPass = (rule, val, callback) => {
+        if(val === '') {
+          callback(new Error('请输入重复密码'));
+        } else {
+          if(val !== this.ruleForm2.newPass) {
+            callback(new Error('重复密码与新密码不符'));
+          } else {
+            callback();
+          }
+        }
+      };
       return {
         ruleForm2: {
           pass: '',
           newPass: '',
+          repeatNewPass: ''
         },
         rules2: {
           pass: [
@@ -61,6 +73,9 @@
           ],
           newPass: [
             { validator: validatePass2, trigger: 'blur' }
+          ],
+          repeatNewPass: [
+            { validator: validateNewPass, trigger: 'blur'}
           ]
         },
         navMsg:'修改密码'
