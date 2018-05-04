@@ -16,9 +16,9 @@
     clickFn 按钮的点击事件，arg1为索引，arg2为行数据
 -->
 <template>
-  <el-table style="width: 100%;text-align: center;" :data="rowData">
+  <el-table style="width: 98%;text-align: center;min-width: 980px;" :data="rowData">
     <template v-for="item in headers">
-      <el-table-column :prop="item.prop" :label="item.label"></el-table-column>
+      <el-table-column :prop="item.prop" :label="item.label" :width="item.width"></el-table-column>
     </template>
     <el-table-column prop="operations" label="操作" v-if="operations.length > 0">
       <template slot-scope="scope">
@@ -42,7 +42,7 @@ Vue.use(Button);
 export default {
   data() {
     return {
-      tableData: []
+
     }
   },
   props: ['headers','operations','rowData']

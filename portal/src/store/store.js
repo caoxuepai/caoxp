@@ -10,7 +10,8 @@ export default new Vuex.Store({
     token: null,
     title: '',
     isLogin: '',
-    navList:[],
+    roleCode:''
+
   },
   mutations: {
     [types.LOGIN]: (state, data) => {
@@ -27,8 +28,8 @@ export default new Vuex.Store({
     [types.ISLOGIN]: (state, data) => {
       state.isLogin = data.isLogin;
     },
-    [types.NAVLIST]: (state, data) => {
-      state.navList =data;
+    [types.ROLECODE]:(state,data) => {
+      state.roleCode = data.roleCode
     }
   }
 })

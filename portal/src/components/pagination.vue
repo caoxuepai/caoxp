@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="footer-pagination">
     <el-pagination
       @current-change="handleCurrentChange"
       :current-page="currentPage"
@@ -30,19 +30,16 @@
         default: 1
       }
     },
-    created () {
-      /*let pageArr = [];
-      for(let i=1; i <= this.pageCount; i++) {
-        pageArr.push(i);
-      }
-      this.page = pageArr;*/
-    },
     methods: {
       handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
+        this.$emit('changePage', val);
       }
     }
   }
 </script>
 <style>
+  .footer-pagination {
+    margin: 30px auto;
+    text-align: center;
+  }
 </style>

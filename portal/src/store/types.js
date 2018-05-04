@@ -6,4 +6,4 @@ export const TITLE = 'title';
 
 export const ISLOGIN = 'islogin';
 
-export const NAVLIST = 'navList';
+export const ROLECODE = 'roleCode'

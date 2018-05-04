@@ -22,7 +22,7 @@ a {
   text-decoration: none;
 }
 a:hover {
-  color: #cd0200;
+  color: #2d374b;
 }
 em {
   font-style: normal;
@@ -85,4 +85,12 @@ table button.el-button.grey:hover {
 table button i.iconfont {
   font-size: 12px;
   margin: 0 3px;
+}
+/*nav*/
+.listHeader i span{
+  font-size: 16px;
+  margin-left: 4px;
+}
+.listHeader i{
+  font-style: normal;
 }

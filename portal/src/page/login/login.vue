@@ -68,9 +68,17 @@
           if(valid) {
             axios.post('/login/ajaxLogin', {userName: this.loginForm.username, password: this.loginForm.password}).then((res)=>{
               if(res.code === 0) {
-                window.localStorage.setItem('token', res.data);
+                window.localStorage.setItem('token', res.data.token);
+                window.localStorage.setItem('roleCode',res.data.roleCode);
+                store.commit(types.ROLECODE,{roleCode:window.localStorage.getItem('roleCode')})
                 store.commit(types.LOGIN, {token: window.localStorage.getItem('token')});
-                this.$router.push('/');
+                if (res.data.roleCode=='admin') {
+                    this.$router.push('/');
+                }else if(res.data.roleCode=='operator'){
+                    this.$router.push('/order');
+                }else if(res.data.roleCode=='finance'){
+                    this.$router.push('/3');
+                }
               } else {
                 Message.warning('登录失败');
               }

@@ -1,27 +1,33 @@
 <template>
 	<section class="listHeader">
 		<template v-for="(item , i) in count">
-			<i :class="item.navclassName"></i>
-			<span>{{item.navMsg}}</span>
-			<span v-if="i<count.length-1">{{">>"}}</span>
+      <router-link :to="item.link || ''">
+        <i :class="item.navclassName"></i><span style="margin: 0 8px">{{item.navMsg}}</span>
+      </router-link>
+      <span v-if="i<count.length-1" style="margin: 0 8px;"> >> </span>
 		</template>
 	</section>
 </template>
 <script>
-	import store from '../store/store'
 	export default{
 		name:'navText',
-		props:['navList'],
-		computed: {
-            count () {
-                return this.$store.state.navList  
-            }
-        }
+		data(){
+			return {
+
+			}
+		},
+		props: {
+		  count: {
+		    type: Array,
+        isRequired: true
+      }
+    }
 	}
 </script>
 <style type="text/css">
 	.listHeader{
 		height: 50px;
 		line-height: 50px;
+    margin-bottom: 10px;
 	}
 </style>

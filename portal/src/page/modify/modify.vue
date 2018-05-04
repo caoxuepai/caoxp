@@ -2,36 +2,36 @@
 	<el-container>
     <Nav :msg="navMsg"/>
 		<el-main>
-  			<div class="modify-box">
-    			 <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" label-width="100px" class="demo-ruleForm">
-					<el-form-item label="旧密码" prop="pass">
-					    <el-input type="password" v-model="ruleForm2.pass" auto-complete="off" placeholder="请输入旧密码"></el-input>
-					</el-form-item>
-					<el-form-item label="新密码" prop="newPass">
-					    <el-input type="password" v-model="ruleForm2.newPass" auto-complete="off" placeholder="请输入新密码"></el-input>
-					</el-form-item>
-					<el-form-item>
-					    <el-button type="primary" @click="submitForm('ruleForm2')">提交</el-button>
-					    <el-button @click="resetForm('ruleForm2')">重置</el-button>
-					  </el-form-item>
-					</el-form>
-  			</div>
-  		</el-main>
-  	</el-container>
+      <div class="modify-box">
+        <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" label-width="100px" class="demo-ruleForm">
+          <el-form-item label="旧密码" prop="pass">
+            <el-input type="password" v-model="ruleForm2.pass" auto-complete="off" placeholder="请输入旧密码"></el-input>
+          </el-form-item>
+          <el-form-item label="新密码" prop="newPass">
+            <el-input type="password" v-model="ruleForm2.newPass" auto-complete="off" placeholder="请输入新密码"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="submitForm('ruleForm2')">提交</el-button>
+            <el-button @click="resetForm('ruleForm2')">重置</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-main>
+  </el-container>
 </template>
 <script>
 	import Vue from 'vue';
-  	import axios from '@/api/index'
-  	import Header from '@/components/header.vue' 
-    import Nav from '@/components/nav.vue'
-  	import {Input, Form, FormItem, Button, Message,Container,Main} from 'element-ui';
-  	Vue.use(Input);
-  	Vue.use(Form);
-  	Vue.use(FormItem);
-  	Vue.use(Button);
+  import axios from '@/api/index'
+  import Header from '@/components/header.vue'
+  import Nav from '@/components/nav.vue'
+  import {Input, Form, FormItem, Button, Message,Container,Main} from 'element-ui';
+  Vue.use(Input);
+  Vue.use(Form);
+  Vue.use(FormItem);
+  Vue.use(Button);
 	Vue.use(Container);
  	Vue.use(Main);
-  	export default {
+  export default {
     data() {
       var validatePass = (rule, value, callback) => {
         if (value === '') {
@@ -89,7 +89,6 @@
       }
     },
     components: {Header,Nav}
-
   }
 </script>
 <style>

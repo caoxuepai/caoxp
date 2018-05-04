@@ -7,6 +7,11 @@ import Login from '@/page/login/login'
 import Modify from '@/page/modify/modify'
 import Supplier from '@/page/suppliers/suppliers'
 import Add from '@/page/suppliers/add/add'
+import Order from '@/page/order/order'
+import ExchangeRate from '@/page/exchangerage/index'
+import Financial from '@/page/financial/index'
+import Detail from '@/page/financial/detail/index'
+import UserManager from '@/page/usermanager/index'
 
 Vue.use(Router)
 
@@ -41,6 +46,41 @@ const routers = new Router({
         requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
       },
       component:Add
+    },
+    {
+      path:'/order',
+      meta:{
+        requireAuth:true,
+      },
+      component:Order
+    },
+    {
+      path:'/exchangeRate',
+      meta: {
+        requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+      },
+      component:ExchangeRate
+    },
+    {
+      path:'/financial',
+      meta:{
+        requireAuth:true,
+      },
+      component:Financial
+    },
+    {
+      path:'/financial/detail',
+      meta:{
+        requireAuth:true,
+      },
+      component:Detail
+    },
+    {
+      path: '/usermanager',
+      meta: {
+        requireAuth: true,
+      },
+      component: UserManager
     }
   ]
 })

@@ -4,7 +4,7 @@
       <el-aside width="240px"><aside-box></aside-box></el-aside>
       <el-container>
         <el-header><header-box></header-box></el-header>
-        <el-main>
+        <el-main style="margin-left: 20px;">
 			    <router-view></router-view>
         </el-main>
       </el-container>
