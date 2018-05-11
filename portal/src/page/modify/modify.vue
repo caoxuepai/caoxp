@@ -110,7 +110,6 @@
   .modify-box {
     width: 500px;
     margin: 10% auto;
-    background: #ffffff;
     padding: 30px;
   }
 </style>

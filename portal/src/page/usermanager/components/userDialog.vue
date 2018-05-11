@@ -10,7 +10,7 @@
             <el-input type="password" v-model="formData.password" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="角色：" prop="roleId">
-            <el-radio v-model="formData.roleId" label="1">管理员</el-radio>
+            <!--<el-radio v-model="formData.roleId" label="1">管理员</el-radio>-->
             <el-radio v-model="formData.roleId" label="3">订单处理员</el-radio>
             <el-radio v-model="formData.roleId" label="2">财务</el-radio>
           </el-form-item>
@@ -55,7 +55,7 @@
         formData: {
           userName: '',
           password: '',
-          roleId: '1',
+          roleId: '3',
           uuid: ''
         },
         rules: {
@@ -110,7 +110,6 @@
                 }
               })
             }
-            console.log('用户名--' + this.formData.userName + ', 密码--' + this.formData.password + ', 角色---' + this.formData.role);
           } else {
             return false;
           }
@@ -126,18 +125,16 @@
           this.formData = {
             userName: '',
             password: '',
-            roleId: '1',
+            roleId: '3',
             uuid: ''
           };
         } else {
           this.title = '编辑用户';
           this.create = false;
-          console.log(data.editData);
           this.formData.userName = data.editData.userName;
           this.formData.password = data.editData.password;
           this.formData.roleId = data.editData.roleId.toString();
           this.formData.uuid = data.editData.uuid;
-          console.log(this.formData.roleId);
           this.visible = true;
         }
       });

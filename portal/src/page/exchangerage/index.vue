@@ -3,11 +3,12 @@
     <Nav :count="count"></Nav>
     <el-form label-position="left" label-width="100px" :model="rateData">
       <el-form-item label="当前汇率">
-        <el-input v-model="rateData.exchangeRate" style="width: 300px" placeholder="当前汇率"></el-input>
+        <el-input v-model="rateData.exchangeRate" style="width: 300px;margin-bottom:14px" placeholder="当前汇率"></el-input>
+        <p class="exchangeRate_text">1人民币 = 0.2230新西兰元</p>
+        <p class="exchangeRate_text">1新西兰元 = 4.4853人民币</p>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit()">保存</el-button>
-        <el-button>返回</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -39,7 +40,6 @@
     },
     methods: {
       onSubmit() {
-        console.log(this.exchangeRate);
         this.changeRates();
       },
       currentRates(){
@@ -66,5 +66,9 @@
 <style>
   .el-form-item__label {
     text-align: right!important;
+  }
+  .exchangeRate_text{
+    color: #999;
+    line-height: 30px;
   }
 </style>

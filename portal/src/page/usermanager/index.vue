@@ -100,7 +100,7 @@
             that.rowData = [];
             res.data.list.forEach((item, i) => {
               item.index = i+1;
-              if(item.disabled === 1) {
+              if(item.disabled) {
                 item.disabledText = '不可用';
               } else {
                 item.disabledText = '可用';

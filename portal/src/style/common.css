@@ -37,49 +37,58 @@ img {
 table {
   border-collapse: collapse;
   border-spacing: 0;
+  font-size: 12px;
+  line-height: 1.5;
 }
 p {
   word-wrap: break-word;
 }
 
-
-table button.el-button {
-  color: #ffffff;
-  background-color: #666666;
+button.el-button {
   border: none;
-  padding: 7px 5px;
-  margin: 0 15px;
+  margin: 0 10px;
+  display: inline-block;
+  border-radius: 0;
 }
-table button.el-button:active, table button.el-button:hover, table button.el-button:focus {
+table button.el-button {
+  padding: 7px 5px;
+  background-color: #666666;
   color: #ffffff;
+}
+button.el-button:active, button.el-button:hover, button.el-button:focus {
+  /*color: #ffffff;*/
   border: none;
 }
 /*蓝色按钮*/
-table button.el-button.blue {
+button.el-button.blue {
   background-color: #4ca5ff;
+  color: #ffffff;
 }
-table button.el-button.blue:hover {
+button.el-button.blue:hover {
   background-color: #3880f5;
 }
 /*绿色按钮*/
-table button.el-button.green {
+button.el-button.green {
   background-color: #45ad7a;
+  color: #ffffff;
 }
-table button.el-button.green:hover {
+button.el-button.green:hover {
   background-color: #129956;
 }
 /*红色按钮*/
-table button.el-button.red {
+button.el-button.red {
   background-color: #f08166;
+  color: #ffffff;
 }
-table button.el-button.red:hover {
+button.el-button.red:hover {
   background-color: #e34a25;
 }
 /*灰色按钮*/
-table button.el-button.grey {
+button.el-button.grey {
   background-color: #85a6c4;
+  color: #ffffff;
 }
-table button.el-button.grey:hover {
+button.el-button.grey:hover {
   background-color: #598bb8;
 }
 
@@ -94,4 +103,23 @@ table button i.iconfont {
 }
 .listHeader i{
   font-style: normal;
+}
+
+.el-table th {
+  font-size: 13px;
+  font-weight: normal;
+  background-color: #53aee3;
+  color: #ffffff;
+  line-height: 1;
+}
+.el-table td, .el-table th {
+  padding: 8px 0;
+}
+.el-table th > .cell {
+  line-height: 1.8;
+  padding: 0;
+  margin: 0;
+}
+.el-table td.active {
+  color: red;
 }

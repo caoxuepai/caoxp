@@ -5,14 +5,20 @@ import Router from 'vue-router'
 import Index from '@/page/index'
 import Login from '@/page/login/login'
 import Modify from '@/page/modify/modify'
-import Supplier from '@/page/suppliers/suppliers'
-import Add from '@/page/suppliers/add/add'
-import Order from '@/page/order/order'
+import Supplier from '@/page/suppliers/index'
+import ProductList from '@/page/suppliers/components/productList'
+import Order from '@/page/order/index'
+import OrderHandling from '@/page/order/components/orderHandling'
+import OrderManage from '@/page/order/components/orderDetail'
 import ExchangeRate from '@/page/exchangerage/index'
 import Financial from '@/page/financial/index'
+import SupplierFinacial from '@/page/financial/suppliers/index'
+import MFWFinancial from '@/page/financial/mafengwo/index'
 import Detail from '@/page/financial/detail/index'
 import UserManager from '@/page/usermanager/index'
-
+import Cancellation from '@/page/cancellation/index'
+import ViewOrder from '@/page/cancellation/components/viewOrder'
+import CancellDetail from '@/page/cancellation/components/cancellDetail'
 Vue.use(Router)
 
 const routers = new Router({
@@ -38,21 +44,29 @@ const routers = new Router({
       meta:{
         requireAuth:true,
       },
-      component:Supplier
-    },
-    {
-      path:'/suppliers/add',
-      meta: {
-        requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-      },
-      component:Add
+      component:Supplier,
+      children: [
+        {
+          path: 'product',
+          component: ProductList
+        }
+      ]
     },
     {
       path:'/order',
       meta:{
         requireAuth:true,
       },
-      component:Order
+      component:Order,
+      children: [
+        {
+          path: 'orderHandling',
+          component: OrderHandling
+        }, {
+          path: 'orderManage',
+          component: OrderManage
+        },
+      ]
     },
     {
       path:'/exchangeRate',
@@ -66,14 +80,16 @@ const routers = new Router({
       meta:{
         requireAuth:true,
       },
-      component:Financial
-    },
-    {
-      path:'/financial/detail',
-      meta:{
-        requireAuth:true,
-      },
-      component:Detail
+      component:Financial,
+      children: [
+        {
+          path: 'supplier',
+          component: SupplierFinacial
+        }, {
+          path: 'mafengwo',
+          component: MFWFinancial
+        },
+      ]
     },
     {
       path: '/usermanager',
@@ -81,6 +97,23 @@ const routers = new Router({
         requireAuth: true,
       },
       component: UserManager
+    },
+    {
+      path: '/cancellation',
+      meta: {
+        requireAuth: true,
+      },
+      component: Cancellation,
+      children:[
+        {
+          path:'ViewOrder',
+          component:ViewOrder
+        },
+        {
+          path:'cancellDetail',
+          component:CancellDetail
+        }
+      ]
     }
   ]
 })

@@ -80,7 +80,7 @@
                 }else if(res.data.roleCode=='operator'){
                     this.$router.push('/order');
                 }else if(res.data.roleCode=='finance'){
-                    this.$router.push('/3');
+                    this.$router.push('/cancellation');
                 }
               } else {
                 Message.warning('登录失败');

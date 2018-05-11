@@ -4,7 +4,7 @@
       <el-aside width="240px"><aside-box></aside-box></el-aside>
       <el-container>
         <el-header><header-box></header-box></el-header>
-        <el-main style="margin-left: 20px;">
+        <el-main style="margin-left: 10px;">
 			    <router-view></router-view>
         </el-main>
       </el-container>
@@ -31,6 +31,11 @@
       }
     },
     components: {AsideBox, HeaderBox},
+    created() {
+      if(this.$route.path === '/login') {
+        this.login = true;
+      }
+    },
     updated() {
       this.login = this.$store.state.isLogin
     }

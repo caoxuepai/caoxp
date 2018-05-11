@@ -3,7 +3,7 @@
     <div class="log">
       中旅智能平台
     </div>
-    <el-menu v-if='roleCode=="admin"' :default-active="$route.path" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" router>
+    <el-menu v-if='roleCode=="admin"' :default-active="$route.path" :default-openeds="defaultOpen" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" router>
       <el-menu-item router index="/">
         <template slot="title"><i class="iconfont icon-shouye aside-icon"></i>首页</template>
       </el-menu-item>
@@ -23,12 +23,17 @@
       </el-menu-item>
     </el-menu>
     <el-menu v-else-if='roleCode=="finance"' :default-active="$route.path" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" router>
-      <el-submenu index='3'>
-        <template slot="title"><i class="iconfont icon-hexiao aside-icon"></i>订单核销</template>
-      </el-submenu>
-      <el-menu-item index='/financial'>
-        <template slot="title"><i class="iconfont icon-caiwuguanli aside-icon"></i>财务管理</template>
+      <el-menu-item index='/cancellation'>
+        <template slot="title"><i class="iconfont icon-dingdan aside-icon"></i>订单核销</template>
       </el-menu-item>
+      <el-submenu index="financial">
+        <template slot="title"><i class="iconfont icon-caiwuguanli aside-icon"></i>财务管理</template>
+          <el-menu-item index="/financial/supplier">供应商对账</el-menu-item>
+          <el-menu-item index="/financial/mafengwo">马蜂窝对账</el-menu-item>
+      </el-submenu>
+      <!--<el-menu-item index='/financial'>
+        <template slot="title"><i class="iconfont icon-caiwuguanli aside-icon"></i>财务管理</template>
+      </el-menu-item>-->
     </el-menu>
   </div>
 </template>
@@ -45,6 +50,16 @@
 	Vue.use(DropdownMenu);
   Vue.use(DropdownItem)
 	export default{
+    data() {
+      return {
+        defaultOpen: []
+      }
+    },
+    created() {
+      if(this.$route.path.indexOf('financial') >= 0) {
+        this.defaultOpen.push('financial')
+      }
+    },
     methods: {
       handleOpen(key, keyPath) {
         console.log(key, keyPath,1);
@@ -66,7 +81,7 @@
 		color:#fff;
 		line-height: 60px;
 		text-align: center;
-		background: #717584
+		background: #002046
 	}
 	.el-menu{
 		background-color: rgb(51, 55, 68);

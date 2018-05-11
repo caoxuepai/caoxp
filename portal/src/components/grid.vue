@@ -16,11 +16,12 @@
     clickFn 按钮的点击事件，arg1为索引，arg2为行数据
 -->
 <template>
-  <el-table style="width: 98%;text-align: center;min-width: 880px;" :data="rowData">
-    <template v-for="item in headers">
-      <el-table-column :prop="item.prop" :label="item.label" :width="item.width"></el-table-column>
+  <el-table style="width: 100%;text-align: center;min-width: 880px;" :data="rowData">
+    <template v-for="(item,i) in headers">
+      <el-table-column :prop="item.prop" :label="item.label" :width="item.width" :fixed="item.fixed" style="color: red">
+      </el-table-column>
     </template>
-    <el-table-column prop="operations" label="操作" v-if="operations.length > 0">
+    <el-table-column prop="operations" :fixed="operations[0].fixed" label="操作" v-if="operations && operations.length > 0" :width="operations[0].width">
       <template slot-scope="scope">
         <template v-for="(value, i) in operations">
           <el-button :key="i" size="mini" :class="value.className" :title="value.title" @click="value.clickFn(scope.$index, scope.row)" :style="value.style">
