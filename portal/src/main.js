@@ -7,7 +7,6 @@ import router from './router'
 import axios from './api/index'
 import './style/common.css'
 import * as types from './store/types.js'
-
 Vue.config.productionTip = false
 
 require('./mock.js')

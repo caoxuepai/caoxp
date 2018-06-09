@@ -69,11 +69,11 @@ button.el-button.blue:hover {
 }
 /*绿色按钮*/
 button.el-button.green {
-  background-color: #45ad7a;
+  background-color: #24ad45;
   color: #ffffff;
 }
 button.el-button.green:hover {
-  background-color: #129956;
+  background-color: #1ba53c;
 }
 /*红色按钮*/
 button.el-button.red {
@@ -91,10 +91,9 @@ button.el-button.grey {
 button.el-button.grey:hover {
   background-color: #598bb8;
 }
-
-table button i.iconfont {
+button i.iconfont {
   font-size: 12px;
-  margin: 0 3px;
+  margin-right:4px;
 }
 /*nav*/
 .listHeader i span{
@@ -108,8 +107,9 @@ table button i.iconfont {
 .el-table th {
   font-size: 13px;
   font-weight: normal;
-  background-color: #53aee3;
-  color: #ffffff;
+  background-color: #d9edf7;
+  color: #38789b;
+  font-weight:bold;
   line-height: 1;
 }
 .el-table td, .el-table th {

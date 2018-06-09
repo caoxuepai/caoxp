@@ -1,24 +1,35 @@
 <template>
   <div>
     <template v-if="mainShow">
-      <Nav :count="count"></Nav>
-      <Dialog :centerDialogVisible="removeDialog" :dialog="dialog" @cancel="cancel" @confirm="confirm"></Dialog>
-      <el-container style="justify-content:space-between">
-        <el-row>
-          <el-button type="success" @click="add">添加</el-button>
-        </el-row>
-        <el-form :inline="true" :model="formInline" class="demo-form-inline">
-          <el-form-item>
-            <el-input v-model="formInline.user" placeholder="供应商"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="onSubmit">查询</el-button>
-          </el-form-item>
-        </el-form>
-      </el-container>
-      <el-container>
-        <grid-box :headers="tableHeaders" :operations="operations" :row-data="rowData"></grid-box>
-      </el-container>
+      <div>
+        <create-suppliers-dialog></create-suppliers-dialog>
+        <Nav :count="count"></Nav>
+        <el-container style="justify-content: space-between">
+          <el-row style="line-height: 32px;">
+            <el-button size="medium" class="green" @click.prevent="add" style="margin-left:0">添加</el-button>
+          </el-row>
+          <el-row style="line-height: 32px;">
+            <el-form :inline="true" :model="searchForm" ref="searchForm" size="small">
+              <el-form-item label="编号">
+                <el-input v-model="searchForm.id" @input="searchSubmit"></el-input>
+              </el-form-item>
+              <el-form-item label="名称">
+                <el-input v-model="searchForm.name" @input="searchSubmit"></el-input>
+              </el-form-item>
+              <el-form-item label="城市">
+                <el-input v-model="searchForm.city" @input="searchSubmit"></el-input>
+              </el-form-item>
+              <el-form-item style="margin-right:0">
+                <el-button class="blue" @click="searchSubmit">查询</el-button>
+              </el-form-item>
+            </el-form>
+          </el-row>
+        </el-container>
+        <el-container>
+          <grid-box :headers="tableHeaders" :operations="operations" :row-data="rowData" :tags="tags"></grid-box>
+        </el-container>
+        <pagination :page-count="page.pageCount" :current-page="page.currentPage" @changePage="changePage"></pagination>
+      </div>
     </template>
     <template v-if="!mainShow">
       <router-view></router-view>
@@ -30,8 +41,10 @@
   import axios from '@/api/index';
   import Nav from '@/components/nav.vue';
   import GridBox from '@/components/grid.vue';
-  import Dialog from '@/components/dialog.vue';
-  import{Container,Row,Button,Form,FormItem,Input,MessageBox} from 'element-ui';
+  import pagination from '@/components/pagination.vue'
+  import CreateSuppliersDialog from './components/createSuppliersDialog.vue';
+  import {event} from './event';
+  import{Container,Row,Button,Form,FormItem,Input,MessageBox,Message} from 'element-ui';
   Vue.use(Container);
   Vue.use(Row);
   Vue.use(Button);
@@ -39,30 +52,49 @@
   Vue.use(FormItem);
   Vue.use(Input);
   export default {
+    created(){
+      this.supplierList();
+      const that = this;
+      event.$on('refreshAdd', () => {
+        that.supplierList();
+      })
+    },
     data(){
       return {
         mainShow: true,
-        formInline: {
-          user: '',
+        searchForm: {
+          id: '',
+          name: '',
+          city: ''
         },
         tableHeaders: [
-          {prop: 'id', label: '编号'},
-          {prop: 'name', label: '供应商名称'},
-          {prop: 'address', label: '地址'},
+          {prop: 'code', label: '编号'},
+          {prop: 'name', label: '中文名称'},
+          {prop: 'nameEn', label: '英文名称'},
+          {prop: 'address', label: '邮寄地址'},
+          {prop: 'zipCode', label: '邮编'},
           {prop: 'email', label: '邮箱'},
-          {prop: 'phone', label: '联系电话'},
+          {prop: 'tel', label: '联系电话'},
           {prop: 'fax', label: '传真'},
-          {prop: 'city', label: '城市'}
+          {prop: 'country', label: '所在国家'},
+          {prop: 'city', label: '所在城市'},
+          {prop: 'jstNumber', label: '税号'},
+          {prop: 'jstRate', label: '税率'},
         ],
+        page: {pageCount: 50, currentPage: 1},
         operations: [
           {
             icon: 'iconfont icon-chakan',
-            className: 'green',
-            label: '查看商品',
-            width: '280px',
-            title: '查看商品',
+            className: 'grey',
+            label: '查看产品',
+            width: '260px',
+            fixed: 'right',
+            title: '查看产品',
             clickFn: (i, data) => {
-              this.$router.push('/suppliers/product');
+              this.$router.push({
+                path:'/suppliers/product/',
+                query:{Id:data.code}
+              });
             }
           },
           {
@@ -72,31 +104,34 @@
             width:'172px',
             title: '编辑',
             clickFn: (index, data) => {
-              console.log(data.age);
-              console.log(index);
+              event.$emit('openSuppliersDialog', {create: false, editData: data});
             }
           },{
             icon: 'iconfont icon-shanchu',
-            className: 'grey',
+            className: 'red',
             label: '删除',
             title: '删除',
             clickFn:(index, data) => {
-              console.log('删除第'+index+'行');
-              const _this = this;
-              this.removeDialog=true;
-              this.confirm = () => {
-                _this.removeDialog=false;
-                _this.rowData.splice(index,1);
-              }
+              MessageBox.confirm('确定删除所选供应商吗？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消'
+              }).then(() => {
+                axios.post('/admin/supplier/abled', {code: data.code, status: 1}).then((res) => {
+                  if(res.code === 0) {
+                    Message.success('供应商删除成功');
+                    this.supplierList();
+                  } else  {
+                    Message.error('供应商删除失败');
+                  }
+                })
+              }).catch(() => {
+
+              });
             }
 		      }
 		    ],
-        rowData: [
-          {id: '1', name: 'Arice', address: 'Woodlyn Park',email:'0158jia@163.com',phone:'15712305478',fax:'010-80541202',city:'Matamata'},
-          {id: '2', name: 'Arice', address: 'Woodlyn Park',email:'0158jia@163.com',phone:'15712305478',fax:'010-80541202',city:'Matamata'}
-        ],
-        removeDialog:false,
-        dialog:'确定要删除吗？',
+        rowData: [],
+        tags: [],
         count:[
            {navclassName:'icon iconfont icon-gongyingshang',navMsg:'供应商管理'},
         ],
@@ -111,21 +146,43 @@
         }
       }
     },
-    components: {Nav,GridBox,Dialog},
+    components: {Nav,GridBox,CreateSuppliersDialog,pagination},
     methods: {
-      cancel(){
-        this.removeDialog = false;
-      },
-      confirm(){
-        this.removeDialog=false;
-      },
-      onSubmit() {
-        console.log('submit!');
+      searchSubmit() {
+        const code = this.searchForm.id;
+        const name = this.searchForm.name;
+        const city = this.searchForm.city;
+        if(code === '' && name === '' && city === '') {
+          Message.warning('请至少输入一个查询条件');
+        } else {
+          axios.post('/admin/supplier/searchByKeywords', {code: code, name: name, city: city}).then((res) => {
+            if(res.code === 0) {
+              this.page.pageCount = res.data.pageCount;
+              this.rowData = res.data.suppliers;
+            } else {
+              Message.warning('查询失败');
+            }
+          });
+        }
       },
       add(){
-        this.$router.push({path:'/suppliers/add'})
-        console.log('submit!');
-      }
+        event.$emit('openSuppliersDialog', {create: true});
+      },
+      changePage(val) {
+        this.page.currentPage = val;
+        this.supplierList();
+      },
+      supplierList(){
+        const that = this;
+        axios.post('/admin/supplier/list/'+this.page.currentPage).then((res) => {
+          that.page.pageCount = res.data.pageCount;
+          that.rowData = [];
+          res.data.list.forEach((item,i) => {
+            item.index = i+1;
+            that.rowData.push(item);
+          })
+        })
+      },
     },
     mounted() {
       if(this.$route.path === '/suppliers') {

@@ -82,8 +82,8 @@
         tableHeaders2: [
           {prop: 'id', label: 'ID'},
           {prop: 'order', label: '马蜂窝订单号'},
-          {prop: 'name', label: '商品名称'},
-          {prop: 'price', label: '商品价格'},
+          {prop: 'name', label: '产品名称'},
+          {prop: 'price', label: '产品价格'},
           {prop: 'Mprice', label: '马蜂窝单价金额'},
           {prop: 'number', label: '购买个数'},
           {prop: 'Original', label: '订单原始金额'},

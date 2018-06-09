@@ -5,7 +5,7 @@ import router from '../router'
 import {Message} from 'element-ui'
 
 axios.defaults.baseURL = 'http://47.93.192.144:8081/china-travel';
-// axios.defaults.baseURL = 'http://192.168.100.182:8081/china-travel';
+// axios.defaults.baseURL = 'http://192.168.100.57:8081/china-travel';
 
 // http request 拦截器
 axios.interceptors.request.use(

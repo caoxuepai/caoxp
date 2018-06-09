@@ -10,15 +10,18 @@ import ProductList from '@/page/suppliers/components/productList'
 import Order from '@/page/order/index'
 import OrderHandling from '@/page/order/components/orderHandling'
 import OrderManage from '@/page/order/components/orderDetail'
+import EmailToUser from '@/page/order/components/emailToUser'
+import EmailToSuppliers from '@/page/order/components/emailToSuppliers'
 import ExchangeRate from '@/page/exchangerage/index'
 import Financial from '@/page/financial/index'
 import SupplierFinacial from '@/page/financial/suppliers/index'
 import MFWFinancial from '@/page/financial/mafengwo/index'
+import mafengwoDetail from '@/page/financial/mafengwo/components/mafengwoDetail'
 import Detail from '@/page/financial/detail/index'
 import UserManager from '@/page/usermanager/index'
-import Cancellation from '@/page/cancellation/index'
-import ViewOrder from '@/page/cancellation/components/viewOrder'
-import CancellDetail from '@/page/cancellation/components/cancellDetail'
+import Cancelation from '@/page/cancelation/index'
+import ViewOrder from '@/page/cancelation/components/viewOrder'
+import CancelDetail from '@/page/cancelation/components/cancelDetail'
 Vue.use(Router)
 
 const routers = new Router({
@@ -65,7 +68,13 @@ const routers = new Router({
         }, {
           path: 'orderManage',
           component: OrderManage
-        },
+        }, {
+          path: 'emailToSuppliers',
+          component: EmailToSuppliers
+        }, {
+          path: 'emailToUser',
+          component: EmailToUser
+        }
       ]
     },
     {
@@ -87,7 +96,13 @@ const routers = new Router({
           component: SupplierFinacial
         }, {
           path: 'mafengwo',
-          component: MFWFinancial
+          component: MFWFinancial,
+          children:[
+            {
+              path:'mafengwoDetail',
+              component:mafengwoDetail
+            }
+          ]
         },
       ]
     },
@@ -99,19 +114,19 @@ const routers = new Router({
       component: UserManager
     },
     {
-      path: '/cancellation',
+      path: '/cancelation',
       meta: {
         requireAuth: true,
       },
-      component: Cancellation,
+      component: Cancelation,
       children:[
         {
           path:'ViewOrder',
           component:ViewOrder
         },
         {
-          path:'cancellDetail',
-          component:CancellDetail
+          path:'cancelDetail',
+          component:CancelDetail
         }
       ]
     }

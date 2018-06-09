@@ -1,9 +1,9 @@
 <template>
-  <div style="width: 240px;height: 100%;background-color: rgba(51, 55, 68, 1)">
+  <div style="width: 240px;height: 100%;background-color: #192231">
     <div class="log">
       中旅智能平台
     </div>
-    <el-menu v-if='roleCode=="admin"' :default-active="$route.path" :default-openeds="defaultOpen" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" router>
+    <el-menu v-if='roleCode=="admin"' :default-active="$route.path" :default-openeds="defaultOpen" @open="handleOpen" @close="handleClose" router>
       <el-menu-item router index="/">
         <template slot="title"><i class="iconfont icon-shouye aside-icon"></i>首页</template>
       </el-menu-item>
@@ -13,17 +13,18 @@
       <el-menu-item index='/exchangeRate'>
         <template slot="title"><i class="iconfont icon-bizhonghuishuai aside-icon"></i>汇率管理</template>
       </el-menu-item>
-      <el-menu-item index='/usermanager'>
-        <template slot="title"><i class="iconfont icon-yonghuguanli aside-icon"></i>用户管理</template>
-      </el-menu-item>
+      <el-submenu index='management'>
+        <template slot="title"><i class="iconfont icon-yonghuguanli aside-icon"></i>系统管理</template>
+        <el-menu-item index="/usermanager">用户管理</el-menu-item>
+      </el-submenu>
     </el-menu>
-    <el-menu v-else-if='roleCode=="operator"' :default-active="$route.path" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" router>
+    <el-menu v-else-if='roleCode=="operator"' :default-active="$route.path" @open="handleOpen" @close="handleClose" router>
       <el-menu-item index='/order'>
         <template slot="title"><i class="iconfont icon-dingdan aside-icon"></i>订单管理</template>
       </el-menu-item>
     </el-menu>
     <el-menu v-else-if='roleCode=="finance"' :default-active="$route.path" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" router>
-      <el-menu-item index='/cancellation'>
+      <el-menu-item index='/cancelation'>
         <template slot="title"><i class="iconfont icon-dingdan aside-icon"></i>订单核销</template>
       </el-menu-item>
       <el-submenu index="financial">
@@ -81,23 +82,25 @@
 		color:#fff;
 		line-height: 60px;
 		text-align: center;
-		background: #002046
+		background: #2b9ff5
 	}
 	.el-menu{
-		background-color: rgb(51, 55, 68);
-		border-right: none;
+		background-color: #1d2b36 !important;
+		border-right: none !important;
 	}
 	.el-submenu__title:hover {
-    background-color: #484b56;
+    background-color: #1e1f23 !important;
+      color:#fff !important;
 	}
 	.el-submenu ,.el-submenu__title ,.el-menu-item{
-		color: #fff;
+		color: #fff !important;
 	}
   .el-menu-item:focus, .el-menu-item:hover,.el-menu-item.is-active {
-    background-color: #484b56;
+    background-color: #1e1f23 !important;
+    color:#fff !important;
   }
   .el-menu-item.is-active{
-    color: #ffffff;
+    color: #ffffff !important;
   }
   .aside-icon {
     margin-right: 10px;

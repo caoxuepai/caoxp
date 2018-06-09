@@ -2,7 +2,7 @@
   <div>
     <Nav :count="count"></Nav>
     <user-dialog></user-dialog>
-    <el-button type="success" style="margin-bottom: 15px;" size="medium" @click.prevent="addUser">添加</el-button>
+    <el-button class="green" style="margin-bottom: 15px;margin-left:0" size="medium" @click.prevent="addUser">添加</el-button>
     <el-container>
       <grid-box :headers="tableHeaders" :operations="operations" :row-data="rowData"></grid-box>
     </el-container>

@@ -30,15 +30,25 @@
         </template>
       </template>
     </el-table-column>
+    <el-table-column prop="tags" :fixed="tags[0].fixed" label="" v-if="tags && tags.length > 0" :width="tags[0].width">
+      <template slot-scope="scope2">
+        <template v-for="(item, i) in tags">
+          <template v-if="scope2.row.changed">
+            <el-button type="info" size="small" @click="item.clickFn(scope2, scope2.row)">{{item.label}}</el-button>
+          </template>
+        </template>
+      </template>
+    </el-table-column>
   </el-table>
 </template>
 <script>
 import Vue from 'vue';
-import {Table, TableColumn, Button} from 'element-ui';
+import {Table, TableColumn, Button, Tag} from 'element-ui';
 
 Vue.use(Table);
 Vue.use(TableColumn);
 Vue.use(Button);
+Vue.use(Tag);
 
 export default {
   data() {
@@ -46,7 +56,7 @@ export default {
 
     }
   },
-  props: ['headers','operations','rowData']
+  props: ['headers','operations','rowData','tags']
 }
 </script>
 <style>
