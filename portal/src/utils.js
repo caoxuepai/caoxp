@@ -28,3 +28,51 @@ export function isEmail(str) {
   var reg = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
   return reg.test(str);
 }
+
+/*
+ @param String name  cookie名  （必须）
+ @param String value cookie值  （必须）
+ @param term         cookie存活时间(必须)  时间秒数
+ * */
+export function setCookie(name, value, term) {
+
+  const param1 = name + '=' + escape(value) + ';';
+
+  expires = new Date();
+  if (!term) {
+    term = 1800;
+  }
+  expires.setTime(expires.getTime() + 1000 * term);
+  const param2 = 'expires=' + expires.toUTCString() + ';';
+  document.cookie = param1 + param2 + ';path=/';
+}
+
+export function getCookie(name) {
+  const cookie_name = name + '=';
+  const cookie_length = document.cookie.length;
+  let cookie_begin = 0;
+  while (cookie_begin < cookie_length) {
+    const value_begin = cookie_begin + cookie_name.length;
+    if (document.cookie.substring(cookie_begin, value_begin) == cookie_name) {
+      let value_end = document.cookie.indexOf(';', value_begin);
+      if (value_end == -1) {
+        value_end = cookie_length;
+      }
+      return unescape(document.cookie.substring(value_begin, value_end))
+    }
+    cookie_begin = document.cookie.indexOf(' ', cookie_begin) + 1;
+    if (cookie_begin == 0) {
+      break;
+    }
+  }
+  return null;
+}
+
+export function delCookie(name) {
+  let exp = new Date();
+  exp.setTime(exp.getTime() - 1);
+  const cval = getCookie(name);
+  if (cval != null) {
+    document.cookie = name + '=' + cval + ';path=/;expires=' + exp.toUTCString();
+  }
+}

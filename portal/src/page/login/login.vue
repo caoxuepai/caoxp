@@ -11,7 +11,7 @@
           <el-form-item prop="password">
             <el-input type="password" placeholder="请输入密码" v-model="loginForm.password"></el-input>
           </el-form-item>
-          <el-checkbox v-model="remember">记住我</el-checkbox>
+          <el-checkbox v-model="remember"><span style="color: #333333;">记住我</span></el-checkbox>
           <el-form-item>
             <el-button class="blue" @click="submitLogin('loginForm')" style="width: 100%;margin-left:0;margin-top:10px">登录</el-button>
           </el-form-item>
@@ -71,17 +71,56 @@
               if(res.code === 0) {
                 window.localStorage.setItem('token', res.data.token);
                 window.localStorage.setItem('roleCode',res.data.roleCode);
-                store.commit(types.ROLECODE,{roleCode:window.localStorage.getItem('roleCode')})
+                store.commit(types.ROLECODE,{roleCode:res.data.roleCode});
                 window.localStorage.setItem('username', that.loginForm.username);
-//                store.commit(types.ROLECODE,{roleCode:res.data.roleCode});
-                store.commit(types.LOGIN, {token: window.localStorage.getItem('token')});
-                if (res.data.roleCode=='admin') {
+                store.commit(types.LOGIN, {token: res.data.token});
+                window.localStorage.setItem('permissions', res.data.permissions);
+                store.commit(types.PERMISSIONS, {permissions: res.data.permissions});
+                if(res.data.permissions.indexOf('global:analysis') != -1) {
+                  this.$router.push('/');
+                } else {
+                  switch (res.data.permissions[0]) {
+                    case 'user:manage':
+                      this.$router.push('/usermanager');
+                      break;
+                    case 'rate:manage':
+                      this.$router.push('/exchangeRate');
+                      break;
+                    case 'global:analysis':
+                      this.$router.push('/');
+                      break;
+                    case 'supplier:manage':
+                      this.$router.push('/suppliers');
+                      break;
+                    case 'order:manage':
+                      this.$router.push('/order');
+                      break;
+                    case 'supplier:verification':
+                      this.$router.push('/cancelation/supplier');
+                      break;
+                    case 'mfw:verification':
+                      this.$router.push('/cancelation/mafengwo');
+                      break;
+                    case 'cost:view':
+                      this.$router.push('/financial/supplier');
+                      break;
+                    case 'income:view':
+                      this.$router.push('/financial/mafengwo');
+                      break;
+                    case 'cost-income:view':
+                      this.$router.push('/inout');
+                      break;
+                    default:
+                      break;
+                  }
+                }
+                /*if (res.data.roleCode=='admin') {
                     this.$router.push('/');
                 }else if(res.data.roleCode=='operator'){
                     this.$router.push('/order');
                 }else if(res.data.roleCode=='finance'){
-                    this.$router.push('/cancelation');
-                }
+                    this.$router.push('/cancelation/supplier');
+                }*/
               } else {
                 Message.warning('登录失败');
               }
@@ -132,8 +171,8 @@
     line-height: 60px;
     color: #409eff;
   }
-  .el-checkbox__label{
+  /*.el-checkbox__label{
     color:#fff !important;
     font-weight:bold;
-  }
+  }*/
 </style>

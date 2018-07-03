@@ -4,31 +4,29 @@
       <div>
         <create-suppliers-dialog></create-suppliers-dialog>
         <Nav :count="count"></Nav>
-        <el-container style="justify-content: space-between">
-          <el-row style="line-height: 32px;">
-            <el-button size="medium" class="green" @click.prevent="add" style="margin-left:0">添加</el-button>
-          </el-row>
-          <el-row style="line-height: 32px;">
-            <el-form :inline="true" :model="searchForm" ref="searchForm" size="small">
-              <el-form-item label="编号">
-                <el-input v-model="searchForm.id" @input="searchSubmit"></el-input>
-              </el-form-item>
-              <el-form-item label="名称">
-                <el-input v-model="searchForm.name" @input="searchSubmit"></el-input>
-              </el-form-item>
-              <el-form-item label="城市">
-                <el-input v-model="searchForm.city" @input="searchSubmit"></el-input>
-              </el-form-item>
-              <el-form-item style="margin-right:0">
-                <el-button class="blue" @click="searchSubmit">查询</el-button>
-              </el-form-item>
-            </el-form>
-          </el-row>
+        <el-container style="justify-content:space-between;background: #fff;padding:14px 0 0 14px">
+          <el-button size="medium" class="green" @click.prevent="add" style="margin-left:0"><i class="iconfont icon-add"></i>添加</el-button>
+        </el-container>
+        <el-container style="justify-content:space-between;background: #fff;padding:20px 0 0 14px">
+          <el-form :inline="true" :model="searchForm" ref="searchForm" size="small">
+            <el-form-item label="编号">
+              <el-input v-model="searchForm.code" @input="searchSubmit"></el-input>
+            </el-form-item>
+            <el-form-item label="中文名称">
+              <el-input v-model="searchForm.name" @input="searchSubmit"></el-input>
+            </el-form-item>
+            <el-form-item label="所在城市">
+              <el-input v-model="searchForm.poCity" @input="searchSubmit"></el-input>
+            </el-form-item>
+            <el-form-item style="margin-right:0">
+              <el-button class="blue" @click="searchSubmit">查询</el-button>
+            </el-form-item>
+          </el-form>
         </el-container>
         <el-container>
           <grid-box :headers="tableHeaders" :operations="operations" :row-data="rowData" :tags="tags"></grid-box>
         </el-container>
-        <pagination :page-count="page.pageCount" :current-page="page.currentPage" @changePage="changePage"></pagination>
+        <pagination v-if="page.pageCount > 1" :total="page.total" :page-count="page.pageCount" :current-page="page.currentPage" @changePage="changePage"></pagination>
       </div>
     </template>
     <template v-if="!mainShow">
@@ -53,7 +51,9 @@
   Vue.use(Input);
   export default {
     created(){
-      this.supplierList();
+      if(this.mainShow) {
+        this.supplierList();
+      }
       const that = this;
       event.$on('refreshAdd', () => {
         that.supplierList();
@@ -63,31 +63,32 @@
       return {
         mainShow: true,
         searchForm: {
-          id: '',
+          code: '',
           name: '',
-          city: ''
+          poCity: ''
         },
         tableHeaders: [
           {prop: 'code', label: '编号'},
           {prop: 'name', label: '中文名称'},
           {prop: 'nameEn', label: '英文名称'},
-          {prop: 'address', label: '邮寄地址'},
-          {prop: 'zipCode', label: '邮编'},
-          {prop: 'email', label: '邮箱'},
+          {prop: 'poAddress', label: '邮寄地址'},
+          {prop: 'poPostalCode', label: '邮编'},
+          {prop: 'emailAddress', label: '邮箱'},
           {prop: 'tel', label: '联系电话'},
           {prop: 'fax', label: '传真'},
-          {prop: 'country', label: '所在国家'},
-          {prop: 'city', label: '所在城市'},
-          {prop: 'jstNumber', label: '税号'},
-          {prop: 'jstRate', label: '税率'},
+          {prop: 'poCountry', label: '所在国家'},
+          {prop: 'poRegion', label: '所在地区'},
+          {prop: 'poCity', label: '所在城市'},
+          {prop: 'accountCode', label: '税号'},
+          {prop: 'taxRate', label: '税率'},
         ],
-        page: {pageCount: 50, currentPage: 1},
+        page: {pageCount: 1, currentPage: 1, total: 0},
         operations: [
           {
             icon: 'iconfont icon-chakan',
             className: 'grey',
             label: '查看产品',
-            width: '260px',
+            width: '200px',
             fixed: 'right',
             title: '查看产品',
             clickFn: (i, data) => {
@@ -106,7 +107,7 @@
             clickFn: (index, data) => {
               event.$emit('openSuppliersDialog', {create: false, editData: data});
             }
-          },{
+          }/*,{
             icon: 'iconfont icon-shanchu',
             className: 'red',
             label: '删除',
@@ -128,7 +129,7 @@
 
               });
             }
-		      }
+		      }*/
 		    ],
         rowData: [],
         tags: [],
@@ -149,15 +150,15 @@
     components: {Nav,GridBox,CreateSuppliersDialog,pagination},
     methods: {
       searchSubmit() {
-        const code = this.searchForm.id;
-        const name = this.searchForm.name;
-        const city = this.searchForm.city;
-        if(code === '' && name === '' && city === '') {
+        const {code, name, poCity} = this.searchForm;
+        if(code === '' && name === '' && poCity === '') {
+          this.supplierList();
           Message.warning('请至少输入一个查询条件');
         } else {
-          axios.post('/admin/supplier/searchByKeywords', {code: code, name: name, city: city}).then((res) => {
+          axios.post('/admin/supplier/searchByKeywords', {code: code, name: name, poCity: poCity}).then((res) => {
             if(res.code === 0) {
               this.page.pageCount = res.data.pageCount;
+              this.page.count = res.data.count;
               this.rowData = res.data.suppliers;
             } else {
               Message.warning('查询失败');
@@ -176,9 +177,10 @@
         const that = this;
         axios.post('/admin/supplier/list/'+this.page.currentPage).then((res) => {
           that.page.pageCount = res.data.pageCount;
+          that.page.total = res.data.count;
           that.rowData = [];
           res.data.list.forEach((item,i) => {
-            item.index = i+1;
+//            item.index = i+1;
             that.rowData.push(item);
           })
         })

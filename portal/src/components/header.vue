@@ -5,7 +5,7 @@
         <i class="iconfont icon-yonghu header-icon" style="font-size: 18px;"></i>{{ username }}
       </span>
       <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item command="repwd" v-if="roleCode != 'admin'"><i class="iconfont header-icon icon-xiugaimima"></i>修改密码</el-dropdown-item>
+        <el-dropdown-item command="repwd"><i class="iconfont header-icon icon-xiugaimima"></i>修改密码</el-dropdown-item>
         <el-dropdown-item command="logout"><i class="iconfont icon-zhuxiao header-icon"></i>注销登录</el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>

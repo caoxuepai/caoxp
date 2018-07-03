@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="stateLine">
     <Nav :count = "count"></Nav>
     <el-row>
       <span class="orderTitle">处理方式：</span>
@@ -7,23 +7,82 @@
         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
       </el-select>
     </el-row>
-    <div v-if="state=='推送确认单'">
+    <div v-if="state=='发送预定邮件'">
       <el-row>
-        <span class="orderTitle">发送方式：</span>
-        <label>{{send}}</label>
+        <span class="supplierinfo">供应商名称：</span>
+        <label>{{Name}}</label>
       </el-row>
       <el-row>
-        <span class="orderTitle">姓名：</span>
-        <label>{{name}}</label>
+        <span class="supplierinfo">英文名称：</span>
+        <label>{{EnName}}</label>
       </el-row>
       <el-row>
-        <span class="orderTitle">邮件地址：</span>
+        <span class="supplierinfo">邮件地址：</span>
         <label>{{email}}</label>
       </el-row>
       <el-row>
-        <span class="orderTitle">确认码：</span>
-        <el-input v-model="sureCode" style="width: 200px;"></el-input>
+        <span class="supplierinfo">fax：</span>
+        <label>{{fax}}</label>
       </el-row>
+      <el-row>
+      <span class="supplierinfo">电话：</span>
+      <label>{{tel}}</label>
+      </el-row>
+      <div class="Detaillist" style="margin-top:20px" v-for="item in rowData">
+        <el-container style="background: #d9edf7;padding:20px 14px 10px;color:#38789b;">
+          <el-row style="margin-right:20px;min-width:260px">
+            订单号：{{item.orderId}}
+          </el-row>
+          <el-row>
+            产品：{{item.salesName}}
+          </el-row>
+        </el-container>
+        <el-container style="background: #d9edf7;padding:0px 14px 20px;color:#38789b;position:relative">
+          <el-row style="margin-right:20px;min-width:260px;line-height:22px">
+            <div>姓名：{{item.bookingPeople?item.bookingPeople.name:''}}</div>
+            <div>邮箱：{{item.bookingPeople?item.bookingPeople.email:''}}</div>
+            <div>手机号：{{item.bookingPeople?item.bookingPeople.phone:''}}</div>
+            <div>手机区号：{{item.bookingPeople?item.bookingPeople.phoneArea:''}}</div>
+            <div>微信：{{item.bookingPeople?item.bookingPeople.wechat:''}}</div>
+            <div>订单备注：{{item.bookingPeople?item.bookingPeople.remark:''}}</div>
+          </el-row>
+          <el-row style="margin-right:20px;min-width:300px;line-height:22px">
+            <div>产品ID：{{item.salesId}}</div>
+            <div>目的地：{{item.mdd}}</div>
+            <div>订单创建时间：{{item.ctime}}</div>
+            <div>订单支付时间：{{item.paytime}}</div>
+            <div>订单金额：{{item.totalPrice}}</div>
+            <div>支付金额：{{item.paymentFee}}</div>
+            <div>旅行出行时间：{{item.goDate}}</div>
+            <div>旅行结束时间：{{item.endDate}}</div>
+          </el-row>
+          <el-row style="line-height:22px">
+            <div>供应商：{{item.supplier.name}}</div>
+            <div>供应商ID：{{item.supplier.id}}</div>
+            <div>sku名称：{{item.skuName}}</div>
+            <div style="display:inline-block">产品类型：</div>
+            <div style="margin-left:70px;margin-top:-22px">
+              <div v-for="item in item.items" style="display:inline-block">
+                <span style="margin-right:10px">{{item.name}}</span>
+                <span style="margin-right:10px">价格：{{item.price}}</span>
+                <span style="margin-right:10px">数量：{{item.num}}</span>
+              </div>
+            </div>
+            <div>减价策略：
+              <span v-if="item.promotionDetail.reduceMfw ===0 && item.promotionDetail.reduceOta ===0">无</span>
+              <span style="margin-right:10px" v-if="item.promotionDetail.reduceMfw !=0 ">马蜂窝优惠券：-{{item.promotionDetail.reduceMfw}}</span>
+              <span v-if="item.promotionDetail.reduceOta !=0 ">商家优惠券：-{{item.promotionDetail.reduceOta}}</span>
+            </div>
+          </el-row>
+          <el-row style="position:absolute;bottom:10px;right:10px;line-height:0">
+            <template>
+              <el-checkbox-group v-model="checked" @change="checkValue">
+                <el-checkbox :label="item.orderId">合并</el-checkbox>
+              </el-checkbox-group>
+            </template>
+          </el-row>
+        </el-container>
+      </div>
       <div class="footBtn">
         <el-button class="green" @click="next"><i class="iconfont icon-buoumaotubiao08"></i>下一步</el-button>
         <el-button class="grey" @click="back"><i class="iconfont icon-cancel"></i>返回</el-button>
@@ -84,7 +143,7 @@
         <el-input type="textarea" autosize v-model="remarks" style="width:220px;min-height:40px;height:40px"></el-input>
       </el-row>
       <div class="footBtn">
-        <el-button class="green" @click="changeOrderInfo"><i class="iconfont icon-buoumaotubiao08"></i>下一步</el-button>
+        <el-button class="green" @click="changeOrderInfo"><i class="iconfont icon-save"></i>保存</el-button>
         <el-button class="grey" @click="back"><i class="iconfont icon-cancel"></i>返回</el-button>
       </div>
     </div>
@@ -104,20 +163,25 @@
   Vue.use(CheckboxGroup)
   export default{
     created(){
-      this.BookingInfo();
+      this.Suborders()
       this.getOrderByOrderId();
     },
     data(){
       return{
-        send:'邮件发送',
-        name:'',
+        Name:'',
+        EnName:'',
         email:'',
         sureCode:'',
-        state:'推送确认单',
+        state:'发送预定邮件',
+        fax:'',
+        tel:'',
         salesName:'',
         salesUuid:'',
         prductName:null,
         skuName:'',
+        checkItem:[],
+        rowData:[],
+        checked:[],
         orderNum:'',
         personNum:0,
         orderPrice:'',
@@ -130,13 +194,14 @@
         otaSkuId:'',
         skuPrices:[],
         selectCheack:[],
+        orderIds:[],
         items:[],
         count:[
           {navclassName:'icon iconfont icon-shouye',navMsg:'订单管理',link:'/order'},
-          {navMsg:'已作废订单处理'}
+          {navMsg:'待确认订单处理'}
         ],
         options:[
-          {value:'推送确认单',label:'推送确认单'},
+          {value:'发送预定邮件',label:'发送预定邮件'},
           {value:'更改出行',label:'更改出行'},
           {value:'关闭',label:'关闭'},
         ],
@@ -149,7 +214,7 @@
     methods:{
       change(value) {
         if(value=='关闭'){
-          this.open()
+          this.open();
         }else{
           this.state=value;
         }
@@ -159,8 +224,8 @@
         this.items.forEach(e=>{
           personNum += e.num-0;
         })
-        this.getMoney()
-        this.personNum=personNum
+          this.getMoney()
+          this.personNum=personNum
       },
       changePrice(value){
         this.getMoney()
@@ -195,7 +260,7 @@
           if (res.code === 0){
             res.data.additionalSkus.forEach((e) => {
               arradditional.push(Object.assign({name:e.skuName,num:0,priceType:24,price:e.skuPrices[0].price-0},e));
-            })
+          })
             this.additionalItem=arradditional;
           }
         })
@@ -231,30 +296,56 @@
         this.additionalItem.forEach((e) => {
           money+= e.price* e.num
         })
-        this.prductName=money-this.orderPrice
-      },
+          this.prductName=money-this.orderPrice
+        },
       open(){
         const that = this;
         MessageBox.confirm('关闭订单后将作废，不能对订单进行操作，确定关闭此订单吗？',{
           confirmButtonText: '确定',
           concelButtonText:'取消'
         }).then(() => {
-          axios.post('/operator/order/closeOrder',{orderId:this.$route.query.orderId}).then((res) => {
-            if(res.code === 0){
+        axios.post('/operator/order/closeOrder',{orderId:this.$route.query.orderId}).then((res) => {
+          if(res.code === 0){
             Message.success('订单关闭');
           }
         })
-          this.$router.push({path:'/order'})
-      }).catch(() =>{
-          message: '已取消关闭',
-          that.state = '更改出行'
-      })
+        this.$router.push({path:'/order'})
+        }).catch(() =>{
+            message: '已取消关闭',
+            that.state = '更改出行'
+        })
       },
       back(){
-        this.$router.push({path:'/order'})
+        this.$router.push({path:'/order'});
+      },
+      checkValue(item){
+        this.orderIds = [];
+        this.orderIds=item;
       },
       next(){
-
+        if(this.orderIds != ''){
+          this.manualMergeOrder();
+        }else{
+          Message.warning('请选择要合并的订单');
+        }
+      },
+      //合并订单
+      manualMergeOrder(){
+        const that = this;
+        axios.post('/operator/order/manualMergeOrder',{orderIds:JSON.stringify(this.orderIds)}).then((res) =>{
+          if(res.code === 0 && this.orderIds !='' ){
+            this.$router.push({
+              path:'/order/emailToSuppliers?orderType=0',
+              query:{
+                ctsOrderId:res.data
+              }
+            })
+          }else if(this.orderIds == ''){
+            Message.warning('请选择要合并的订单');
+          }else{
+            Message.warning('合并失败');
+          }
+        })
       },
       //提交更改出行
       changeOrderInfo(){
@@ -279,26 +370,31 @@
         axios.post('/operator/order/changeOrderInfo',{changeInfo:JSON.stringify(data)}).then((res) => {
           if(res.code === 0 ){
             Message.success('修改成功');
-            this.$router.push({path:'/order/emailToSuppliers?orderType=2'});   //待出单状态下给供应商发信息
+            this.Suborders();
           }else{
             Message.warning('修改失败');
           }
         })
       },
-      //推送确认单
-      BookingInfo(){
+      //可合并订单列表
+      Suborders(){
         const that = this;
-        axios.post('/operator/order/getBookingInfoByOrderId',{orderId:this.$route.query.orderId}).then((res) => {
-          if(res.code === 0 ){
-            that.name = res.data.name;
-            that.email = res.data.email;
-          }
+        axios.post('/operator/order/getMergeOrdersByStatus',{orderId:this.$route.query.orderId,dealStatus:0}).then((res) =>{
+          that.rowData = [];
+          res.data.forEach((item, i) => {
+            that.rowData.push(item);
+          });
         })
       },
       getOrderByOrderId(){
         const that = this;
         axios.post('/operator/order/getOrderByOrderId',{orderId:this.$route.query.orderId}).then((res) => {
           if(res.code === 0 ){
+            that.Name = res.data.supplier.name;
+            that.EnName = res.data.supplier.nameEn;
+            that.email = res.data.supplier.emailAddress;
+            that.fax = res.data.supplier.fax;
+            that.tel = res.data.supplier.tel;
             that.ID = res.data.ctsOrderId;
             that.orderNum = res.data.orderId;
             that.travelTime = res.data.goDate;
@@ -315,7 +411,7 @@
               }else{
                 arraddition.push(e);
               }
-          })
+            })
             that.items=arr;
             that.additionalItem=arraddition;
             that.supplierCode = res.data.supplierCode;
@@ -325,12 +421,19 @@
           }
         })
       },
-
     },
     components:{Nav}
   }
 </script>
 <style>
+  .stateLine .el-row{
+    line-height:44px;
+  }
+  .el-row span.supplierinfo{
+    display: inline-block;
+    width:86px;
+    text-align: left;
+  }
   .el-row span.orderTitle{
     /*font-weight: bold;*/
     display: inline-block;
@@ -346,4 +449,5 @@
   .red{
     color:red;
   }
+
 </style>

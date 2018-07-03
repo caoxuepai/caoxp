@@ -65,7 +65,7 @@
       },
       currentRates(){
         const that = this;
-        axios.post('/admin/getExchangeRate').then((res) => {
+        axios.post('/admin/exchangeRate/getExchangeRate').then((res) => {
           if(res.code === 0){
             this.rateData.exchangeRate=res.data
           }
@@ -75,7 +75,7 @@
         const that = this;
         this.$refs[form].validate((valid) => {
           if(valid) {
-            axios.post('/admin/updateExchangeRate',{exchangeRate:this.rateData.exchangeRate}).then((res) => {
+            axios.post('/admin/exchangeRate/updateExchangeRate',{exchangeRate:this.rateData.exchangeRate}).then((res) => {
               if(res.code === 0) {
                 Message.success('保存成功');
               } else {
@@ -97,9 +97,6 @@
   }
 </script>
 <style>
-  .el-form-item__label {
-    text-align: right!important;
-  }
   .exchangeRate_text{
     color: #999;
     line-height: 30px;

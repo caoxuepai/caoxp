@@ -1,36 +1,39 @@
 <template>
   <div>
     <create-product-dialog :code = "this.$route.query.Id"></create-product-dialog>
+    <open-additional-dialog></open-additional-dialog>
     <open-sku-dialog></open-sku-dialog>
     <Nav :count="count"></Nav>
-    <el-container style="justify-content: space-between">
-      <el-row style="line-height: 32px">
-        <el-button class="green" size="medium" @click="add" style="margin-left:0">添加</el-button>
-      </el-row>
-      <el-row style="line-height: 32px">
-        <el-form :inline="true" :model="searchForm" ref="searchForm" size="small">
-          <el-form-item label="马蜂窝sku_id">
-            <el-input v-model="searchForm.skuId" @input="searchSubmit"></el-input>
-          </el-form-item>
-          <el-form-item label="产品名称">
-            <el-input v-model="searchForm.salesName" @input="searchSubmit"></el-input>
-          </el-form-item>
-          <el-form-item label="销售类型" prop="skuType">
-            <el-select v-model="searchForm.skuType" style="width:180px" @change="searchSubmit">
-              <el-option label="全部" value="0"></el-option>
-              <el-option label="自由销售" value="1"></el-option>
-              <el-option label="邮件确认" value="2"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item style="margin-right:0">
-            <el-button class="blue" @click="searchSubmit">查询</el-button>
-          </el-form-item>
-        </el-form>
-      </el-row>
+    <el-container style="justify-content:space-between;background: #fff;padding:14px 0 0 14px">
+      <el-button class="green" size="medium" @click="add" style="margin-left:0"><i class="iconfont icon-add"></i>添加</el-button>
+    </el-container>
+    <el-container style="justify-content:space-between;background: #fff;padding:20px 0 0 14px">
+      <el-form :inline="true" :model="searchForm" ref="searchForm" size="small">
+        <el-form-item label="马蜂窝产品ID">
+          <el-input v-model="searchForm.mfwSalesId" @input="searchSubmit"></el-input>
+        </el-form-item>
+        <el-form-item label="产品中文名称">
+          <el-input v-model="searchForm.salesName" @input="searchSubmit"></el-input>
+        </el-form-item>
+        <el-form-item label="产品英文名称">
+          <el-input v-model="searchForm.salesNameEn" @input="searchSubmit"></el-input>
+        </el-form-item>
+        <el-form-item label="处理类型" prop="dealType">
+          <el-select v-model="searchForm.dealType" style="width:180px" @change="searchSubmit">
+            <el-option label="全部" value="0"></el-option>
+            <el-option label="自由销售" value="1"></el-option>
+            <el-option label="邮件确认" value="2"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item style="margin-right:0">
+          <el-button class="blue" @click="searchSubmit"><i class="iconfont icon-chaxun"></i>查询</el-button>
+        </el-form-item>
+      </el-form>
     </el-container>
     <el-container>
       <grid-box :headers="productHeaders" :operations="operations" :row-data="rowData"></grid-box>
     </el-container>
+    <pagination v-if="page.pageCount > 1" :page-count="page.pageCount" :total="page.total" :current-page="page.currentPage" @changePage="changePage"></pagination>
   </div>
 </template>
 <script>
@@ -40,6 +43,8 @@
   import GridBox from '@/components/grid.vue';
   import CreateProductDialog from './createProductDialog.vue'
   import OpenSkuDialog from './skuDialog.vue'
+  import OpenAdditionalDialog from './additionalDialog.vue'
+  import pagination from '@/components/pagination.vue'
   import {event} from '../event';
   import {MessageBox,Message} from 'element-ui'
   export default {
@@ -57,21 +62,18 @@
           {navMsg:'产品列表'},
         ],
         searchForm: {
-          skuId: '',
+          mfwSalesId: '',
           salesName: '',
-          skuType: ''
+          dealType: '',
+          salesNameEn: ''
         },
-        page: {pageCount: 50, currentPage: 1},
+        page: {pageCount: 1, currentPage: 1, total: 0},
         productHeaders: [
-          {prop: 'id', label: 'ID',width:'80px'},
-          {prop: 'salesId', label: '马蜂窝产品ID',width: '80px'},
-          {prop: 'salesName', label: '产品中文名称'},
-          {prop: 'salesNameEn', label: '产品英文名称'},
-          {prop: 'mdd', label: '目的地', width: '80px'},
-//          {prop: 'purchasePrice', label: '供应商进件价格（NZD）', width: '150px'},
-//          {prop: 'price', label: '马蜂窝销售价格（RMB）', width: '150px'},
-          {prop: 'productType', label: '产品类型', width: '90px'},
-          {prop: 'skuType', label: '产品销售类型', width: '90px'}
+          {prop: 'mfwSalesId', label: '马蜂窝产品ID',width: '100px'},
+          {prop: 'salesName', label: '中文名称'},
+          {prop: 'salesNameEn', label: '英文名称'},
+          {prop: 'salesTypeName', label: '销售类型', width: '90px'},
+          {prop: 'dealTypeName', label: '处理类型', width: '90px'}
         ],
         operations: [
           {
@@ -79,28 +81,30 @@
             className: 'blue',
             label: '编辑',
             fixed: 'right',
-            width: '320px',
+            width: '280px',
             title: '编辑',
             clickFn: (i, data) => {
               event.$emit('openDialog', {create: false, editData: data});
             }
           }, {
-            icon: 'iconfont icon-edit2',
-            className: 'red',
+            icon: 'iconfont icon-kucun',
+            className: 'green',
             label: 'sku',
             title: 'SKU',
             clickFn: (i, data) => {
-              event.$emit('openSkuDialog');
+              event.$emit('openSkuDialog', {uuid: data.uuid, id: data.mfwSalesId, type: data.salesType});
             }
           }, {
-            icon: 'iconfont icon-edit2',
-            className: 'green',
+            icon: 'iconfont icon-fujiaxiangmu',
+            className: 'red',
+//            type: 'special',
+//            speKey: 'additional',
             label: '附加服务',
             title: '附加服务',
             clickFn: (i, data) => {
-              /*event.$emit('openDialog', {create: false, editData: data});*/
+              event.$emit('openAdditionalDialog', {uuid: data.uuid, id: data.mfwSalesId, type: data.salesType});
             }
-          },{
+          }/*,{
             icon: 'iconfont icon-shanchu',
             className: 'grey',
             label: '删除',
@@ -122,12 +126,9 @@
 
               });
             }
-          }
+          }*/
         ],
-        rowData: [
-          {id: '123', salesId: '2532051', salesName: '飞机巡游米尔福德峡湾 飞机观光+订制游船+天窗巴士（电子票免打印+海陆空组合+飞机往返+车去飞回+风景观光巡游+Real Journeys）',
-            salesNameEn: 'CHINA TRAVEL SERVICE (N.Z.) LIMITED', mdd: '皇后镇 米尔福德峡湾', productType: '当地体验', skuType: '定量销售'}
-        ]
+        rowData: []
       }
     },
     methods: {
@@ -136,21 +137,23 @@
       },
       searchSubmit() {
         const that = this;
-        const supplierCode = this.$route.query.Id;
-        console.log(this.searchForm.skuType)
-        const skuId = this.searchForm.skuId ==''?0:this.searchForm.skuId;
-        const salesName = this.searchForm.salesName;
-        const skuType = this.searchForm.skuType==""?0:this.searchForm.skuType;
-        axios.post('/admin/sku/searchByKeywords', {supplierCode:supplierCode,skuId:skuId,salesName:salesName,skuType:skuType}).then((res) => {
+        let searchData = {};
+        searchData.supplierCode = this.$route.query.Id;
+        searchData.mfwSalesId = this.searchForm.mfwSalesId ==''?0:this.searchForm.mfwSalesId;
+        searchData.salesName = this.searchForm.salesName;
+        searchData.salesNameEn = this.searchForm.salesNameEn;
+        searchData.dealType = this.searchForm.dealType==""?0:this.searchForm.dealType;
+        axios.post('/admin/supplier/product/sales/searchByKeywords/'+this.page.currentPage, searchData).then((res) => {
           if(res.code === 0 ){
             this.page.pageCount = res.data.pageCount;
+            this.page.total = res.data.count;
             this.rowData = [];
-            res.data.skus.forEach((item,i) => {
-              item.index = i+1;
-              if(item.skuType === 1){
-                item.skuType = '自由销售'
+            res.data.salesList.forEach((item,i) => {
+//              item.index = i+1;
+              if(item.dealType === 1){
+                item.dealTypeName = '自由销售'
               }else{
-                item.skuType = '邮件确认'
+                item.dealTypeName = '邮件确认'
               }
               that.rowData.push(item);
             })
@@ -165,23 +168,23 @@
       },
       skuaddList(){
         const that = this;
-        /*axios.post('/admin/sku/list/'+this.page.currentPage,{supplierCode:this.$route.query.Id}).then((res) => {
+        axios.post('/admin/supplier/product/sales/list/'+this.page.currentPage,{supplierCode:this.$route.query.Id}).then((res) => {
           if(res.code === 0 ){
             that.page.pageCount = res.data.pageCount;
+            that.page.total = res.data.count;
             that.rowData = [];
             res.data.list.forEach((item,i) => {
-              item.index = i+1;
-              if(item.skuType === 1){
-                item.skuType = '自由销售'
+              if(item.dealType === 1){
+                item.dealTypeName = '自由销售'
               }else{
-                item.skuType = '邮件确认'
+                item.dealTypeName = '邮件确认'
               }
               that.rowData.push(item);
             })
           }
-        })*/
+        })
       }
     },
-    components: {Nav, GridBox, CreateProductDialog,OpenSkuDialog}
+    components: {Nav, GridBox, CreateProductDialog,OpenSkuDialog,OpenAdditionalDialog,pagination}
   }
 </script>

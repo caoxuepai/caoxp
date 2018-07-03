@@ -1,7 +1,7 @@
 <template>
   <div>
     <Nav :count="count"></Nav>
-    <el-container style="background: #fff;padding:14px 0 0 14px;border-bottom:1px solid #eee;">
+    <!--<el-container style="background: #fff;padding:14px 0 0 14px;border-bottom:1px solid #eee;">
       <el-form :inline="true" :model="rateForm" :rules="rateFormRules" ref="rateForm" size="medium">
         <el-form-item label="当前汇率">
           <el-input v-model="rateForm.rate" placeholder="请输入当前汇率" style="border-right:0">
@@ -9,54 +9,45 @@
           </el-input>
         </el-form-item>
         <el-form-item>
-          <el-button class="red" @click="exchangeRateSubmit('rateForm')">汇率转换</el-button>
+          <el-button class="red" @click="exchangeRateSubmit('rateForm')"><i class="iconfont icon-bizhonghuishuai"></i>汇率转换</el-button>
+        </el-form-item>
+      </el-form>
+    </el-container>-->
+    <el-container style="justify-content:space-between;background: #fff;padding:14px 0 0 14px;">
+      <el-form :inline="true" :model="searchForm" ref="searchForm" size="small" label-width="70px" label-position="right">
+        <el-form-item label="ID">
+          <el-input :inline="true" v-model="searchForm.beginNo" style="width:180px"></el-input>&nbsp;~
+          <el-input :inline="true" v-model="searchForm.endNo" style="width:180px"></el-input>
+        </el-form-item>
+        <el-form-item label="账单号">
+          <el-input v-model="searchForm.invoiceNumber" @input="getSupplierBill" style="width:180px"></el-input>
+        </el-form-item>
+        <el-form-item label="供应商">
+          <el-autocomplete v-model="searchForm.supplierName" :fetch-suggestions="getSupplierList" @select="setSupplier" style="width: 180px;"></el-autocomplete>
+          <!--<el-select v-model="searchForm.supplier" style="width:200px" @change="searchSubmit">
+            <el-option v-for="item in suppliers" :key="item.value" :label="item.label" :value="item.value"></el-option>
+          </el-select>-->
+        </el-form-item>
+        <el-form-item label="支付日">
+          <el-date-picker v-model="searchForm.dueDate" @change="getSupplierBill" value-format="yyyy-MM-dd" format="yyyy-MM-dd" type="date" style="width:180px"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="账单日">
+          <el-date-picker v-model="searchForm.invoiceDate" @change="getSupplierBill" value-format="yyyy-MM-dd" format="yyyy-MM-dd" type="date" style="width:180px"></el-date-picker>
+        </el-form-item>
+        <el-form-item>
+          <el-button class="blue" @click="getSupplierBill"><i class="iconfont icon-chaxun"></i>查询</el-button>
         </el-form-item>
       </el-form>
     </el-container>
-    <el-container style="justify-content:space-between;background: #fff;padding:14px 0 0 14px">
-      <el-form :inline="true" :model="searchForm" ref="searchForm" size="small">
-        <el-row>
-          <el-form-item label="ID">
-            <el-input :inline="true" v-model="searchForm.fromDate" style="width:102px"></el-input>&nbsp;~
-            <el-input :inline="true" v-model="searchForm.toDate" style="width:102px"></el-input>
-          </el-form-item>
-          <el-form-item label="账单号">
-            <el-input v-model="searchForm.billNumber"></el-input>
-          </el-form-item>
-          <el-form-item label="供应商">
-            <el-select v-model="searchForm.supplier" style="width:200px">
-              <el-option v-for="item in suppliers" :key="item.value" :label="item.label" :value="item.value"></el-option>
-            </el-select>
-          </el-form-item>
-        </el-row>
-        <el-row>
-          <el-form-item label="出行时间">
-            <el-date-picker v-model="searchForm.travelDate" type="date" placeholder="选择日期"></el-date-picker>
-          </el-form-item>
-          <el-form-item label="支付日">
-            <el-date-picker v-model="searchForm.billDate" type="date" placeholder="选择日期" style="width:200px"></el-date-picker>
-          </el-form-item>
-          <el-form-item label="账单日">
-            <el-date-picker v-model="searchForm.dueDate" type="date" placeholder="选择日期" style="width:200px"></el-date-picker>
-          </el-form-item>
-          <el-form-item>
-            <el-button class="blue" @click="searchSubmit">查询</el-button>
-          </el-form-item>
-        </el-row>
-      </el-form>
+    <el-container>
+      <grid-box :headers="billHeaders" :row-data="billRowData"></grid-box>
     </el-container>
-    <el-container v-if="supplierDataShow" style="width: 98%;margin-bottom: 15px;">
-      <grid-box :headers="supplierHeaders" :row-data="supplierRowData"></grid-box>
-    </el-container>
-    <el-container style="width: 98%">
-      <grid-box :headers="tableHeaders2" :operations="operations2" :row-data="rowData2"></grid-box>
-    </el-container>
-    <el-row flex="center">
-      <pagination :page-count="page.pageCount" :current-page="page.currentPage" @changePage="changePage"></pagination>
+    <el-row flex="center" v-if="page.pageCount > 1">
+      <pagination :page-count="page.pageCount" :total="page.total" :current-page="page.currentPage" @changePage="changePage"></pagination>
     </el-row>
     <el-row flex="center" style="margin-top:16px;text-align: center">
-      <el-button class="green">导出excel</el-button>
-      <el-button type="info" @click="onSubmit">返回</el-button>
+      <el-button class="green" @click="exportBill"><i class="iconfont icon-daochu"></i>导出excel</el-button>
+      <el-button type="info" @click="onSubmit" style="width: 100px;">返回</el-button>
     </el-row>
   </div>
 </template>
@@ -66,84 +57,41 @@
   import Nav from '@/components/nav.vue';
   import GridBox from '@/components/grid.vue';
   import Pagination from '@/components/pagination.vue';
-  import {Container,DatePicker, Row} from 'element-ui';
+  import {Container,DatePicker, Row, Autocomplete} from 'element-ui';
   Vue.use(Container);
   Vue.use(DatePicker);
   Vue.use(Row);
+  Vue.use(Autocomplete);
   export default{
     data(){
-      const validateRate = (rule, val, callback) => {
-        if(val === '') {
-          callback(new Error('请输入当前汇率'));
-        } else {
-          callback();
-        }
-      };
       return{
         page: {
           pageCount: 1,
-          currentPage: 1
-        },
-        rateForm: {
-          rate: '',
-        },
-        rateFormRules: {
-          rate: [
-            { validator: validateRate, trigger: 'blur' }
-          ]
+          currentPage: 1,
+          total: 0
         },
         searchForm: {
-          fromDate: '',
-          toDate: '',
-          billNumber: '',
-          supplier: '',
-          travelDate: '',
-          billDate: '',
-          dueDate: ''
+          beginNo: '',
+          endNo: '',
+          invoiceNumber: '',
+          supplierCode: '',
+          invoiceDate: '',
+          dueDate: '',
+          supplierName: ''
         },
-        suppliers: [
-          {value: 0, label: '全部'},
-          {value: 1, label: '供应商一'},
-          {value: 2, label: '供应商二'}
+        suppliers: [],
+        billHeaders: [
+          {prop: 'ctsOrderId', label: 'ID', width: '160px'},
+          {prop: 'description', label: '发票内容'},
+          {prop: 'contactName', label: '供应商'},
+          {prop: 'unitAmount', label: '价格', width: '90px'},
+          {prop: 'quantity', label: '数量', width: '70px'},
+          {prop: 'taxType', label: '税率', width: '90px'},
+          {prop: 'invoiceNumber', label: '账单号',width:'98px'},
+          {prop: 'dueDate', label: '支付日',width:'98px'},
+          {prop: 'invoiceDate', label: '账单日',width:'98px'}
         ],
-        supplierDataShow: false,
-        supplierHeaders: [
-          {prop: 'id', label: '供应商ID', width: '100px'},
-          {prop: 'name', label: '供应商名称'},
-          {prop: 'Mamout', label: '马蜂窝销售总量'},
-          {prop: 'RMB', label: '马蜂窝应收款（RMB）',width:'168px'},
-          {prop: 'Mbudget', label: '马蜂窝应收款纽币试算',width:'160px'},
-          {prop: 'Gamout', label: '供应商核销数量',width:'120px'},
-          {prop: 'NZD', label: '供应商应付款（NZD）',width:'166px'},
-          {prop: 'Gbudget', label: '供应商应收款人民试算',width:'160px'},
-        ],
-        supplierRowData: [
-          {id: '1', name: 'Arice',Mamout:'2000',RMB:'16480.00',Mbudget:'3674.22',Gamout:'2000',NZD:'2782.42',Gbudget:'12480.00'}
-        ],
-        tableHeaders2: [
-          {prop: 'id', label: 'ID', width: '160px'},
-          {prop: 'name', label: '商品名称', width: '150px'},
-          {prop: 'suppliers', label: '供应商', width: '150px'},
-          {prop: 'payPrice', label: '用户实际支付金额', width: '110px'},
-          {prop: 'mfwSubsidy', label: '马蜂窝补贴金额', width: '100px'},
-          {prop: 'sellerSubsidy', label: '商家补贴', width: '60px'},
-          {prop: 'mfwSettlePrice', label: '马蜂窝应收款（RMB）', width: '140px'},
-          {prop: 'mfwSettlePriceTrial', label: '马蜂窝应收款纽币试算', width: '140px'},
-          {prop: 'suppliersSettlePrice', label: '供应商应付款（NZD）', width: '140px'},
-          {prop: 'suppliersSettlePriceTrial', label: '供应商应付款纽币试算', width: '140px'},
-          {prop: 'priceDifferenceRMB', label: '收付款差额（RMB试算）', width: '150px'},
-          {prop: 'priceDifferenceNZD', label: '收付款差额（NZD试算）', width: '150px'},
-          {prop: 'billnumber', label: '账单号',width:'98px'},
-          {prop: 'termday', label: '支付日',width:'98px'},
-          {prop: 'Statementdate', label: '账单日',width:'98px'}
-        ],
-        rowData2:[
-          {id:'CTS1180426-MFW-8984', name: '大熊猫研究基地门票', suppliers: '供应商一', payPrice: '2050.00', mfwSubsidy: '15.00',
-            sellerSubsidy: '50.00', mfwSettlePrice: '1850.00', mfwSettlePriceTrial: '414.7', suppliersSettlePrice: '358.00',
-            suppliersSettlePriceTrial: '1597.00', priceDifferenceRMB: '253.00', priceDifferenceNZD: '56.7',
-            billnumber: '587954621', termday: '2018-05-02', Statementdate: '2018-04-27'}
-        ],
-        operations2:[],
+        billRowData:[],
         count:[
           {navclassName:'iconfont icon-caiwuguanli icon',navMsg:'财务管理'},
           {navMsg:'供应商对账'},
@@ -155,45 +103,99 @@
         this.$refs[form].validate((valid) => {
           if(valid) {
             const rate = this.rateForm.rate;
-            this.supplierRowData[0].Mbudget = (this.supplierRowData[0].RMB / rate).toFixed(2);
-            this.supplierRowData[0].Gbudget = (this.supplierRowData[0].NZD * rate).toFixed(2);
+//            this.supplierRowData[0].Mbudget = (this.supplierRowData[0].RMB / rate).toFixed(2);
+//            this.supplierRowData[0].Gbudget = (this.supplierRowData[0].NZD * rate).toFixed(2);
+            let suppliersSettlePriceTrial;
             this.rowData2.forEach((item, i) => {
-              item.mfwSettlePriceTrial = (item.mfwSettlePrice / rate).toFixed(2);
-              item.suppliersSettlePriceTrial = (item.suppliersSettlePrice * rate).toFixed(2);
-              item.priceDifferenceRMB = (item.mfwSettlePrice - item.suppliersSettlePriceTrial).toFixed(2);
+              item.mfwSettlePriceTrial = (item.mfwSettlePrice / rate).toFixed(2);   //  马蜂窝应收款纽币试算
+              suppliersSettlePriceTrial = (item.suppliersSettlePrice * rate).toFixed(2);    //  供应商应付款人民币试算
+              item.priceDifferenceRMB = (item.mfwSettlePrice - suppliersSettlePriceTrial).toFixed(2);
               item.priceDifferenceNZD = (item.mfwSettlePriceTrial - item.suppliersSettlePrice).toFixed(2);
             })
-
           }
         });
-      },
-      searchSubmit() {
-        if(this.searchForm.supplier) {
-          this.supplierDataShow = true;
-        } else {
-          this.supplierDataShow = false;
-        }
       },
       onSubmit(){
         this.$router.push({path:'/financial'})
       },
-      changePage() {
-
+      changePage(val) {
+        this.page.currentPage = val;
+        this.getSupplierBill();
+      },
+      getSupplierList(val, callback) {
+        axios.post('/supplier/getByName', {name: val}).then((res) => {
+          if(res.code === 0) {
+            res.data.forEach((item, i) => {
+              item.value = item.name;
+            });
+            this.suppliers = res.data;
+            callback(this.suppliers);
+          }
+        });
+      },
+      setSupplier(item) {
+        this.searchForm.supplierCode = item.code;
+        this.getSupplierBill();
+      },
+      getSupplierBill() {
+        if(this.searchForm.beginNo && !this.searchForm.endNo) {
+          Message.warning('请输入截止ID');
+          return false;
+        }
+        if(!this.searchForm.beginNo && this.searchForm.endNo) {
+          Message.warning('请输入开始ID');
+          return false;
+        }
+        if(!this.searchForm.invoiceDate) {
+          this.searchForm.invoiceDate = '';
+        }
+        if(!this.searchForm.dueDate) {
+          this.searchForm.dueDate = '';
+        }
+        axios.post(`/finance/cost/getSupplierBill`, {
+          pageNo: this.page.currentPage,
+          beginNo: this.searchForm.beginNo,
+          endNo: this.searchForm.endNo,
+          invoiceNumber: this.searchForm.invoiceNumber,
+          supplierCode: this.searchForm.supplierCode,
+          invoiceDate: this.searchForm.invoiceDate,
+          dueDate: this.searchForm.dueDate
+        }).then((res) => {
+          if(res.code === 0) {
+            this.page.pageCount = res.data.pageCount;
+            this.page.total = res.data.count;
+            this.billRowData = [];
+            res.data.list.forEach((item, i) => {
+              this.billRowData.push(item);
+            });
+          } else {
+            Message.error('加载失败，请稍候重试');
+          }
+        })
+      },
+      exportBill() {
+        if(this.searchForm.beginNo && !this.searchForm.endNo) {
+          Message.warning('请输入截止ID');
+          return false;
+        }
+        if(!this.searchForm.beginNo && this.searchForm.endNo) {
+          Message.warning('请输入开始ID');
+          return false;
+        }
+        if(!this.searchForm.invoiceDate) {
+          this.searchForm.invoiceDate = '';
+        }
+        if(!this.searchForm.dueDate) {
+          this.searchForm.dueDate = '';
+        }
+        window.location.href = window._server + `/export/exportCost?beginNo=${this.searchForm.beginNo}&endNo=${this.searchForm.endNo}&invoiceNumber=${this.searchForm.invoiceNumber}&supplierCode=${this.searchForm.supplierCode}&invoiceDate=${this.searchForm.invoiceDate}&dueDate=${this.searchForm.dueDate}`;
       }
+    },
+    created() {
+      this.getSupplierBill();
     },
     components:{Nav,GridBox,Pagination}
   }
 </script>
 <style>
-  .el-date-editor .el-range-separator{
-    width:6%;
-  }
-  .el-input-group__append, .el-input-group__prepend{
-    background:#dfeefc;
-    color:#4ca5ff;
-    border:none;
-  }
-  .el-form-item__label{
-    min-width:80px !important;
-  }
 </style>

@@ -29,7 +29,7 @@
         this.$emit('tabChange', tab);
       }
     },
-    created () {
+    created() {
       this.activeLabel = this.tabItem[0].name;
     }
   }

@@ -59,6 +59,10 @@ button.el-button:active, button.el-button:hover, button.el-button:focus {
   /*color: #ffffff;*/
   border: none;
 }
+button.el-button.border {
+  background-color: #ffffff;
+  border: 1px solid #aaaaaa;
+}
 /*蓝色按钮*/
 button.el-button.blue {
   background-color: #4ca5ff;
@@ -91,9 +95,13 @@ button.el-button.grey {
 button.el-button.grey:hover {
   background-color: #598bb8;
 }
-button i.iconfont {
+button.el-button--default i.iconfont {
+  font-size: 14px;
+  margin-right: 5px;
+}
+button.el-button--mini i.iconfont, button.el-button--small i.iconfont {
   font-size: 12px;
-  margin-right:4px;
+  margin: 0 3px;
 }
 /*nav*/
 .listHeader i span{
@@ -122,4 +130,15 @@ button i.iconfont {
 }
 .el-table td.active {
   color: red;
+}
+
+.el-loading-mask .el-loading-spinner i {
+  color: #cccccc;
+  font-size: 45px;
+}
+.el-loading-spinner .el-loading-text {
+  color: #cccccc;
+  margin: 20px 0;
+  font-size: 20px;
+  letter-spacing: 3px;
 }

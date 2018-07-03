@@ -1,8 +1,8 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" width="500px" style="min-width: 300px;" :before-close="cancel">
+  <el-dialog :title="title" :visible.sync="visible" top="3vh" width="500px" style="min-width: 300px;" :before-close="cancel">
     <el-form :inline="true" size="small" :model="formData" ref="form" label-width="150px" status-icon :rules="rules">
-      <el-form-item v-if="formData.code != ''" label="ID：" prop="code" style="margin-bottom: 15px;">
-        <el-input v-model="formData.code" :disabled=true></el-input>
+      <el-form-item label="ID：" prop="code" style="margin-bottom: 15px;">
+        <el-input v-model="formData.code"></el-input>
       </el-form-item>
       <el-form-item label="中文名称：" prop="name" style="margin-bottom: 15px;">
         <el-input v-model="formData.name"></el-input>
@@ -10,32 +10,35 @@
       <el-form-item label="英文名称：" prop="nameEn" style="margin-bottom: 15px;">
         <el-input v-model="formData.nameEn"></el-input>
       </el-form-item>
-      <el-form-item label="邮寄地址：" prop="address" style="margin-bottom: 15px;">
-        <el-input v-model="formData.address"></el-input>
+      <el-form-item label="邮寄地址：" prop="poAddress" style="margin-bottom: 15px;">
+        <el-input v-model="formData.poAddress"></el-input>
       </el-form-item>
-      <el-form-item label="邮编：" prop="zipCode" style="margin-bottom: 15px;">
-        <el-input v-model="formData.zipCode"></el-input>
+      <el-form-item label="邮编：" prop="poPostalCode" style="margin-bottom: 15px;">
+        <el-input v-model="formData.poPostalCode"></el-input>
       </el-form-item>
-      <el-form-item label="邮箱：" prop="email" style="margin-bottom: 15px;">
-        <el-input v-model="formData.email"></el-input>
+      <el-form-item label="邮箱：" prop="emailAddress" style="margin-bottom: 15px;">
+        <el-input v-model="formData.emailAddress"></el-input>
       </el-form-item>
-      <el-form-item label="联系电话：" prop="phone" style="margin-bottom: 15px;">
-        <el-input v-model="formData.phone"></el-input>
+      <el-form-item label="联系电话：" prop="tel" style="margin-bottom: 15px;">
+        <el-input v-model="formData.tel"></el-input>
       </el-form-item>
       <el-form-item label="传真：" prop="fax" style="margin-bottom: 15px;">
         <el-input v-model="formData.fax"></el-input>
       </el-form-item>
-      <el-form-item label="所在国家：" prop="country" style="margin-bottom: 15px;">
-        <el-input v-model="formData.country"></el-input>
+      <el-form-item label="所在国家：" prop="poCountry" style="margin-bottom: 15px;">
+        <el-input v-model="formData.poCountry"></el-input>
       </el-form-item>
-      <el-form-item label="所在城市：" prop="city" style="margin-bottom: 15px;">
-        <el-input v-model="formData.city"></el-input>
+      <el-form-item label="所在地区：" prop="poRegion" style="margin-bottom: 15px;">
+        <el-input v-model="formData.poRegion"></el-input>
       </el-form-item>
-      <el-form-item label="税号：" prop="jstNumber" style="margin-bottom: 15px;">
-        <el-input v-model="formData.jstNumber"></el-input>
+      <el-form-item label="所在城市：" prop="poCity" style="margin-bottom: 15px;">
+        <el-input v-model="formData.poCity"></el-input>
       </el-form-item>
-      <el-form-item label="税率：" prop="jstRate" style="margin-bottom: 15px;">
-        <el-input v-model="formData.jstRate"><template slot="append">%</template></el-input>
+      <el-form-item label="税号：" prop="accountCode" style="margin-bottom: 15px;">
+        <el-input v-model="formData.accountCode"></el-input>
+      </el-form-item>
+      <el-form-item label="税率：" prop="taxRate" style="margin-bottom: 15px;">
+        <el-input v-model.number="formData.taxRate"><template slot="append">%</template></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -57,87 +60,6 @@
   Vue.use(Dialog);
   export default {
     data() {
-      const validatename = (rule, val, callback) => {
-        if(val === '') {
-          callback(new Error('请输入供应商名称'));
-        } else {
-          callback();
-        }
-      };
-      const validatenameEn = (rule, val, callback) => {
-        if(val === '') {
-          callback(new Error('请输入英文名称'));
-        } else {
-          callback();
-        }
-      };
-      const validateaddress = (rule, val, callback) => {
-        if(val === '') {
-          callback(new Error('请输入邮寄地址'));
-        } else {
-          callback();
-        }
-      };
-      const validateemail = (rule, val, callback) => {
-        if(val === '') {
-          callback(new Error('请输入供应商邮箱'));
-        } else if(!isEmail(val)) {
-          callback(new Error('请输入正确的邮箱'));
-        } else {
-          callback();
-        }
-      };
-      const validatezipCode = (rule, val, callback) => {
-        if(val === '') {
-          callback(new Error('请输入邮编'));
-        } else {
-          callback();
-        }
-      };
-      const validatetel = (rule, val, callback) => {
-        if(val === '') {
-          callback(new Error('请填写供应商联系电话'));
-        } else if(!isRealPhone(val)) {
-          callback(new Error('请填写正确的电话'));
-        } else {
-          callback();
-        }
-      };
-      const validatefax = (rule, val, callback) => {
-        if(val === '') {
-          callback(new Error('请输入供应商传真'));
-        } else {
-          callback();
-        }
-      };
-      const validatecity = (rule, val, callback) => {
-        if(val === '') {
-          callback(new Error('请输入供应商所在城市'));
-        } else {
-          callback();
-        }
-      };
-      const validatecountry = (rule, val, callback) => {
-        if(val === '') {
-          callback(new Error('请输入供应商所在国家'));
-        } else {
-          callback();
-        }
-      };
-      const validatejstNumber = (rule, val, callback) => {
-        if(val === '') {
-          callback(new Error('请输入税号'));
-        } else {
-          callback();
-        }
-      };
-      const validatejstRate = (rule, val, callback) => {
-        if(val === '') {
-          callback(new Error('请输入税率'));
-        } else {
-          callback();
-        }
-      };
       return {
         title: '',
         visible: false,
@@ -145,49 +67,57 @@
           code: '',
           name: '',
           nameEn: '',
-          address: '',
-          zipCode: '',
-          email: '',
-          phone: '',
+          poAddress: '',
+          poPostalCode: '',
+          emailAddress: '',
+          tel: '',
           fax: '',
-          country: '',
-          city: '',
-          jstNumber: '',
-          jstRate: '',
+          poCountry: '',
+          poRegion: '',
+          poCity: '',
+          accountCode: '',
+          taxRate: '',
         },
         rules: {
+          code: [
+            {required: true, message: '请输入供应商ID', trigger: 'blur'},
+          ],
           name: [
-            { validator: validatename, trigger: 'blur' }
+            {required: true, message: '请输入供应商中文名称', trigger: 'blur'},
           ],
           nameEn: [
-            { validator: validatenameEn, trigger: 'blur' }
+            {required: true, message: '请输入供应商英文名称', trigger: 'blur'},
           ],
-          address: [
-            { validator: validateaddress, trigger: 'blur' }
+          poAddress: [
+            {required: true, message: '请输入邮寄地址', trigger: 'blur'},
           ],
-          email: [
-            { validator: validateemail, trigger: 'blur' }
+          poPostalCode:[
+            {required: true, message: '请输入邮编', trigger: 'blur'},
           ],
-          zipCode: [
-            { validator: validatezipCode, trigger: 'blur' }
+          emailAddress: [
+            {required: true, message: '请输入email地址', trigger: 'blur'},
           ],
-          phone: [
-            { validator: validatetel, trigger: 'blur' }
-          ],
-          country: [
-            { validator: validatecountry, trigger: 'blur' }
+          tel: [
+            {required: true, message: '请输入联系电话', trigger: 'blur'},
           ],
           fax: [
-            { validator: validatefax, trigger: 'blur' }
+            {required: true, message: '请输入传真', trigger: 'blur'},
           ],
-          city: [
-            { validator: validatecity, trigger: 'blur' }
+          poCountry: [
+            {required: true, message: '请输入所在国家', trigger: 'blur'},
           ],
-          jstNumber: [
-            { validator: validatejstNumber, trigger: 'blur' }
+          poRegion: [
+            {required: true, message: '请输入所在地区', trigger: 'blur'},
           ],
-          jstRate: [
-            { validator: validatejstRate, trigger: 'blur' }
+          poCity: [
+            {required: true, message: '请输入所在城市', trigger: 'blur'},
+          ],
+          accountCode: [
+            {required: true, message: '请输入税号', trigger: 'blur'},
+          ],
+          taxRate: [
+            {required: true, message: '请输入税率', trigger: 'blur'},
+            {type: 'number', message: '税率必须为数字值'}
           ]
         }
       }
@@ -201,34 +131,23 @@
         this.$refs[form].validate((valid) => {
           if(valid) {
             if(this.create){
-              axios.post('/admin/supplier/add',{
-                name:this.formData.name,
-                address:this.formData.address,
-                email:this.formData.email,
-                tel:this.formData.tel,
-                fax:this.formData.fax,
-                city:this.formData.city
-                }).then((res) => {
-                  if(res.code===0){
+//              const {name,nameEn,poAddress,poPostalCode,emailAddress,tel,fax,poCountry,poRegion,poCity,accountCode,taxRate} = this.formData;
+//              axios.post('/admin/supplier/add',{name,nameEn,poAddress,poPostalCode,emailAddress,tel,fax,poCountry,poRegion,poCity,accountCode,taxRate}).then((res) => {
+              axios.post('/admin/supplier/add',this.formData).then((res) => {
+                if(res.code===0){
                   Message.success('添加成功');
                   this.visible = false;
                   event.$emit('refreshAdd');
                 }
               })
             }else{
-              axios.post('/admin/supplier/edit',{
-                code:this.formData.code,
-                name:this.formData.name,
-                address:this.formData.address,
-                email:this.formData.email,
-                tel:this.formData.tel,
-                fax:this.formData.fax,
-                city:this.formData.city
-              }).then((res) => {
+              axios.post('/admin/supplier/edit',this.formData).then((res) => {
                 if(res.code === 0) {
                   Message.success('编辑成功');
                   that.visible = false;
                   event.$emit('refreshAdd');
+                } else {
+                  Message.error('编辑失败，请重试');
                 }
               })
             }
@@ -248,26 +167,36 @@
             code: '',
             name: '',
             nameEn: '',
-            address: '',
-            zipCode: '',
-            email: '',
-            phone: '',
+            poAddress: '',
+            poPostalCode: '',
+            emailAddress: '',
+            tel: '',
             fax: '',
-            country: '',
-            city: '',
-            jstNumber: '',
-            jstRate: '',
+            poCountry: '',
+            poRegion: '',
+            poCity: '',
+            accountCode: '',
+            taxRate: '',
           };
         } else {
           this.title = '编辑供应商';
           this.create = false;
-          this.formData.name = data.editData.name;
-          this.formData.address = data.editData.address;
-          this.formData.email = data.editData.email;
-          this.formData.tel = data.editData.tel;
-          this.formData.fax = data.editData.fax;
-          this.formData.city = data.editData.city;
-          this.formData.code = data.editData.code;
+          this.formData = {
+            id: data.editData.id,
+            code: data.editData.code,
+            name: data.editData.name,
+            nameEn: data.editData.nameEn,
+            poAddress: data.editData.poAddress,
+            poPostalCode: data.editData.poPostalCode,
+            emailAddress: data.editData.emailAddress,
+            tel: data.editData.tel,
+            fax: data.editData.fax,
+            poCountry: data.editData.poCountry,
+            poRegion: data.editData.poRegion,
+            poCity: data.editData.poCity,
+            accountCode: data.editData.accountCode,
+            taxRate: data.editData.taxRate,
+          };
           this.visible = true;
         }
       })
@@ -275,5 +204,4 @@
   }
 </script>
 <style>
-
 </style>

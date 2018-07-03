@@ -10,8 +10,8 @@ export default new Vuex.Store({
     token: null,
     title: '',
     isLogin: '',
-    roleCode:''
-
+    roleCode:'',
+    permissions: ''
   },
   mutations: {
     [types.LOGIN]: (state, data) => {
@@ -30,6 +30,9 @@ export default new Vuex.Store({
     },
     [types.ROLECODE]:(state,data) => {
       state.roleCode = data.roleCode
+    },
+    [types.PERMISSIONS]: (state, data) => {
+      state.permissions = data.permissions;
     }
   }
 })

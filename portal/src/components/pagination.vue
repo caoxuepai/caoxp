@@ -3,9 +3,9 @@
     <el-pagination
       @current-change="handleCurrentChange"
       :current-page="currentPage"
-      :page-size="100"
       :page-count="pageCount"
-      layout="prev, pager, next, jumper"
+      layout="total, prev, pager, next, jumper"
+      :total="total"
       :background="true">
     </el-pagination>
   </div>
@@ -22,12 +22,13 @@
     },
     props: {
       pageCount: {
-        type: Number,
-        default: 1
+        type: Number
       },
       currentPage: {
-        type: Number,
-        default: 1
+        type: Number
+      },
+      total: {
+        type: Number
       }
     },
     methods: {

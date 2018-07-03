@@ -1,18 +1,18 @@
 <template>
   <div>
-    <el-dialog :title="title" :visible.sync="visible" width="30%" style="min-width: 500px;" :before-close="cancel">
+    <el-dialog :title="title" :visible.sync="visible" width="400px" style="min-width: 500px;" :before-close="cancel">
       <div>
-        <el-form :model="formData" ref="form" status-icon :rules="rules">
+        <el-form :inline="true" size="small" :model="formData" ref="form" status-icon :rules="rules" label-width="100px">
           <el-form-item label="用户名：" prop="userName">
-            <el-input type="text" v-model="formData.userName" :disabled="!create" auto-complete="off"></el-input>
+            <el-input type="text" v-model="formData.userName" :disabled="!create"></el-input>
           </el-form-item>
           <el-form-item label="密码：" prop="password">
-            <el-input type="password" v-model="formData.password" auto-complete="off"></el-input>
+            <el-input type="password" v-model="formData.password"></el-input>
           </el-form-item>
           <el-form-item label="角色：" prop="roleId">
-            <!--<el-radio v-model="formData.roleId" label="1">管理员</el-radio>-->
-            <el-radio v-model="formData.roleId" label="3">订单处理员</el-radio>
-            <el-radio v-model="formData.roleId" label="2">财务</el-radio>
+            <el-radio-group v-model="formData.roleId" size="small" @change="changeRole" style="display: inline-block; width: 250px;">
+              <el-radio v-for="item in roles" :key="item.id" :label="item.id" style="margin-right: 15px;margin-left: 0;line-height: 2.5">{{ item.name }}</el-radio>
+            </el-radio-group>
           </el-form-item>
         </el-form>
       </div>
@@ -27,12 +27,13 @@
   import Vue from 'vue';
   import axios from '@/api/index'
   import {event} from '../event'
-  import {Input, Form, FormItem, Button, Message, Radio} from 'element-ui';
+  import {Input, Form, FormItem, Button, Message, Radio, RadioGroup} from 'element-ui';
   Vue.use(Input);
   Vue.use(Form);
   Vue.use(FormItem);
   Vue.use(Button);
   Vue.use(Radio);
+  Vue.use(RadioGroup);
 
   export default {
     data() {
@@ -55,9 +56,10 @@
         formData: {
           userName: '',
           password: '',
-          roleId: '3',
+          roleId: '',
           uuid: ''
         },
+        roles: [],
         rules: {
           userName: [
             { validator: validateUserName, trigger: 'blur' }
@@ -72,8 +74,23 @@
     },
     components: {},
     methods: {
+      changeRole(val) {
+//        console.log(val);
+      },
       cancel() {
         this.visible = false;
+      },
+      getRoleList() {
+        axios.post('/admin/user/role/list').then((res) => {
+          if(res.code === 0) {
+            this.roles = [];
+            res.data.forEach((item, i) => {
+              this.roles.push({id: item.id, name: item.name});
+            })
+          } else {
+            Message.error('角色列表加载失败');
+          }
+        })
       },
       confirm(form) {
         const that = this;
@@ -118,6 +135,7 @@
     },
     mounted() {
       event.$on('openDialog', (data) => {
+        this.getRoleList();
         if(data.create) {
           this.title = '新增用户';
           this.create = true;
@@ -125,7 +143,7 @@
           this.formData = {
             userName: '',
             password: '',
-            roleId: '3',
+            roleId: '',
             uuid: ''
           };
         } else {
@@ -133,7 +151,7 @@
           this.create = false;
           this.formData.userName = data.editData.userName;
           this.formData.password = data.editData.password;
-          this.formData.roleId = data.editData.roleId.toString();
+          this.formData.roleId = data.editData.roleId;
           this.formData.uuid = data.editData.uuid;
           this.visible = true;
         }
@@ -142,7 +160,4 @@
   }
 </script>
 <style>
-  .el-dialog {
-    min-width: 300px;
-  }
 </style>

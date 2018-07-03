@@ -2,11 +2,11 @@
   <div>
     <Nav :count="count"></Nav>
     <user-dialog></user-dialog>
-    <el-button class="green" style="margin-bottom: 15px;margin-left:0" size="medium" @click.prevent="addUser">添加</el-button>
+    <el-button class="green" style="margin-bottom: 15px;margin-left:0" size="medium" @click.prevent="addUser"><i class="iconfont icon-add"></i>添加</el-button>
     <el-container>
       <grid-box :headers="tableHeaders" :operations="operations" :row-data="rowData"></grid-box>
     </el-container>
-    <pagination :page-count="page.pageCount" :current-page="page.currentPage" @changePage="changePage"></pagination>
+    <pagination v-if="page.pageCount > 1" :total="page.total" :page-count="page.pageCount" :current-page="page.currentPage" @changePage="changePage"></pagination>
   </div>
 </template>
 <script>
@@ -34,7 +34,8 @@
         dialogVisible: false,
         editData: {},
         count:[
-          {navclassName:'icon iconfont icon-yonghuguanli',navMsg:'用户管理'},
+          {navclassName:'icon iconfont icon-yiji-xitongguanli',navMsg:'系统管理'},
+          {navMsg:'用户管理'},
         ],
         tableHeaders: [
           {prop: 'userName', label: '用户名'},
@@ -82,7 +83,7 @@
           {username: 'zhu', role: 'finance', password: '******', disabled: '1', uuid: '012587'},
         ],
         removeDialog:false,
-        page: {pageCount: 50, currentPage: 1}
+        page: {pageCount: 1, currentPage: 1, total: 0}
       }
     },
     methods: {
@@ -96,19 +97,20 @@
       getUser() {
         const that = this;
         axios.post('/admin/user/list/'+this.page.currentPage).then((res) => {
-            that.page.pageCount = res.data.pageCount;
-            that.rowData = [];
-            res.data.list.forEach((item, i) => {
-              item.index = i+1;
-              if(item.disabled) {
-                item.disabledText = '不可用';
-              } else {
-                item.disabledText = '可用';
-              }
-              item.password = '******';
-              item.roleName = item.roles[0].name;
-              item.roleId = item.roles[0].id;
-              that.rowData.push(item);
+          that.page.pageCount = res.data.pageCount;
+          that.page.total = res.data.count;
+          that.rowData = [];
+          res.data.list.forEach((item, i) => {
+            item.index = i+1;
+            if(item.disabled) {
+              item.disabledText = '不可用';
+            } else {
+              item.disabledText = '可用';
+            }
+            item.password = '******';
+            item.roleName = item.roles[0].name;
+            item.roleId = item.roles[0].id;
+            that.rowData.push(item);
           })
         })
       }

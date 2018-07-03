@@ -2,62 +2,46 @@
   <div>
     <template v-if="mainShow">
       <Nav :count="count"></Nav>
-      <el-container style="justify-content:space-between;background: #fff;padding:14px 0 0 14px;border-bottom:1px solid #eee; ">
-        <el-form :inline="true" :model="rateForm" :rules="rateFormRules" ref="rateForm" size="medium">
-          <el-form-item label="当前汇率">
-            <el-input v-model="rateForm.rate" placeholder="请输入当前汇率">
-              <template slot="append">NZD/RMB</template>
-            </el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button class="red" @click="exchangeRateSubmit('rateForm')" style="height:34px">汇率转换</el-button>
-          </el-form-item>
-        </el-form>
-        <el-button class="green" @click="getTrade" style="height:36px">同步马蜂窝已付款账单</el-button>
-      </el-container>
-      <el-container style="background:#fff;padding:14px 0 0 14px">
-        <el-date-picker style="height:36px" v-model="dataValue" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
-        </el-date-picker>
-        <el-button class="blue" style="height: 34px;line-height: 0px" @click="searchForm">查询</el-button>
-      </el-container>
       <el-container style="justify-content:space-between;background: #fff;padding:14px 0 0 14px">
         <el-form :inline="true" :model="searchForm" ref="searchForm" size="small">
-          <el-row>
-            <el-form-item label="账单流水号">
-              <el-input v-model="searchForm.serial_number"></el-input>
-            </el-form-item>
-            <el-form-item label="创建时间">
-              <el-date-picker v-model="Timevalue" type="datetime" placeholder="选择日期时间">
-              </el-date-picker>
-            </el-form-item>
-            <el-form-item label="订单数">
-              <el-input v-model="searchForm.detail_num"></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row>
-            <el-form-item label="支付金额">
-              <el-input v-model="searchForm.pay_amount"></el-input>
-            </el-form-item>
-            <el-form-item label="账单状态">
-              <el-select v-model="searchForm.product">
-                <el-option v-for="item in products" :key="item.value" :label="item.label" :value="item.value"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item>
-              <el-button class="blue" @click="searchSubmit" style="padding:10px 20px">查询</el-button>
-            </el-form-item>
-          </el-row>
+          <el-form-item label="ID">
+            <el-input :inline="true" v-model="searchForm.beginNo" style="width:180px"></el-input>&nbsp;~
+            <el-input :inline="true" v-model="searchForm.endNo" style="width:180px"></el-input>
+          </el-form-item>
+          <el-form-item label="供应商">
+            <el-autocomplete v-model="searchForm.supplierName" :fetch-suggestions="getSupplierList" @select="setSupplier" style="width: 180px;"></el-autocomplete>
+          </el-form-item>
+          <el-form-item label="账单号">
+            <el-input v-model="searchForm.invoiceNumber" @input="getMfwBill"></el-input>
+          </el-form-item>
+          <el-form-item label="支付日">
+            <el-date-picker v-model="searchForm.invoiceDate" @change="getMfwBill" value-format="yyyy-MM-dd" format="yyyy-MM-dd" type="date" placeholder="选择日期时间"></el-date-picker>
+          </el-form-item>
+          <el-form-item label="账单日">
+            <el-date-picker v-model="searchForm.dueDate" @change="getMfwBill" value-format="yyyy-MM-dd" format="yyyy-MM-dd" type="date" placeholder="选择日期时间"></el-date-picker>
+          </el-form-item>
+          <el-form-item label="预定人">
+            <el-input v-model="searchForm.bookPeopleName" @input="getMfwBill"></el-input>
+          </el-form-item>
+          <el-form-item label="出行日期">
+            <el-date-picker v-model="searchForm.goDate" @change="getMfwBill" value-format="yyyy-MM-dd" format="yyyy-MM-dd" type="date" placeholder="选择日期时间"></el-date-picker>
+          </el-form-item>
+          <el-form-item label="订单号">
+            <el-input v-model="searchForm.ctsNo" @input="getMfwBill"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button class="blue" @click="getMfwBill" style="padding:10px 20px"><i class="iconfont icon-chaxun"></i>查询</el-button>
+          </el-form-item>
         </el-form>
       </el-container>
       <el-container>
-        <grid-box :headers="headers" :operations="operations" :row-data="rowData"></grid-box>
+        <grid-box :headers="headers" :row-data="rowData"></grid-box>
       </el-container>
       <el-row flex="center">
-        <pagination :page-count="page.pageCount" :current-page="page.currentPage" @changePage="changePage"></pagination>
+        <pagination :page-count="page.pageCount" :total="page.total" :current-page="page.currentPage" @changePage="changePage"></pagination>
       </el-row>
       <el-row flex="center" style="margin-top:16px;text-align: center">
-        <el-button class="green">导出excel</el-button>
-        <el-button type="info" @click="onSubmit">返回</el-button>
+        <el-button class="green" @click="exportIncome"><i class="iconfont icon-daochu"></i>导出excel</el-button>
       </el-row>
     </template>
     <template v-if="!mainShow">
@@ -67,79 +51,53 @@
 </template>
 <script>
   import Vue from 'vue';
+  import axios from '@/api/index';
   import Nav from '@/components/nav.vue';
   import GridBox from '@/components/grid.vue';
   import Pagination from '@/components/pagination.vue';
-  import {Row, Button, Container, DatePicker} from 'element-ui';
+  import {Row, Button, Container, DatePicker, Message} from 'element-ui';
   Vue.use(Row);
   Vue.use(Button);
   Vue.use(Container);
   Vue.use(DatePicker);
   export default {
     data() {
-      const validateRate = (rule, val, callback) => {
-        if(val === '') {
-          callback(new Error('请输入当前汇率'));
-        } else {
-          callback();
-        }
-      };
       return {
         mainShow:true,
-        Timevalue:'',
-        page: {
-          pageCount: 1,
-          currentPage: 1
-        },
-        dataValue:'',
+        page: { pageCount: 1, currentPage: 1, total: 0},
         count:[
           {navclassName:'icon iconfont icon-caiwuguanli',navMsg:'财务管理'},
           {navMsg:'马蜂窝账单'},
         ],
-        rateForm: {
-          rate: '',
-        },
-        rateFormRules: {
-          rate: [
-            { validator: validateRate, trigger: 'blur' }
-          ]
-        },
         searchForm: {
-          serial_number: '',
-          create_time: '',
-          detail_num: '',
-          pay_amount: '',
-          expect_settle_amount: '',
-          commision_amount: '',
-          cny_deduct_amount:'',
-          cny_settle_amount:''
+          beginNo: '',
+          endNo: '',
+          supplierCode: '',
+          supplierName: '',
+          invoiceNumber: '',
+          invoiceDate: '',
+          dueDate: '',
+          bookPeopleName: '',
+          goDate: '',
+          ctsNo:'',
         },
-        products: [
-          {value: 0, label: '全部'},
-          {value: 1, label: '打款完成'},
-          {value: 2, label: '未打款'}
-        ],
+        suppliers: [],
         headers: [
-          {prop: 'serial_number', label: '	账单流水号',width:'130px'},
-          {prop: 'create_time', label: '创建时间', width: '150px'},
-          {prop: 'detail_num', label: '订单数'},
-          {prop: 'pay_amount', label: '支付金额'},
-          {prop: 'bonus_amount', label: '马蜂窝补贴', width: '80px'},
-          {prop: 'ota_bonus_amount', label: '商家补贴', width: '80px'},
-          {prop: 'expect_settle_amount', label: '应结算金额', width: '80px'},
-          {prop: 'commision_amount', label: '佣金/手续费', width: '80px'},
-          {prop: 'cny_deduct_amount', label: '扣款金额(人民币)', width: '110px'},
-          {prop: 'settle_status', label: '账单状态'},
-          {prop: 'cny_settle_amount', label: '结算金额'},
+          {prop: 'contactName', label: '供应商'},
+          {prop: 'ctsOrderId', label: '订单号'},
+          {prop: 'invoiceNumber', label: '马蜂窝账单号'},
+          {prop: 'invoiceDate', label: '支付日', width: '90px'},
+          {prop: 'dueDate', label: '账单日', width: '90px'},
+          {prop: 'bookPeopleName', label: '预定人'},
+          {prop: 'goDate', label: '出行日期', width: '90px'},
+          {prop: 'quantity', label: '数量', width: '50px'},
+          {prop: 'unitAmount', label: '订单金额', width: '90px'},
+          {prop: 'accountCode', label: '马蜂窝税号'},
+          {prop: 'taxType', label: '马蜂窝税率', width: '80px'},
+          {prop: 'finalFee', label: '支付金额（RMB）', width: '110px'},
+          {prop: 'finalFeeNzl', label: '支付金额试算（NZD）', width: '140px'},
         ],
-        rowData: [
-          {serial_number: '2017050119054580', create_time: '2017-05-01 10:53:03', detail_num: '222', pay_amount: '9595.22',
-            bonus_amount: '20', ota_bonus_amount: '2068.00', expect_settle_amount: '100.00', commision_amount: '50.00',
-            cny_deduct_amount: '2048.00', settle_status: '打款完成', cny_settle_amount: '516156.22'},
-          {serial_number: '2017050119054580', create_time: '2017-05-01 10:53:03', detail_num: '222', pay_amount: '9595.22',
-            bonus_amount: '20', ota_bonus_amount: '2068.00', expect_settle_amount: '100.00', commision_amount: '50.00',
-            cny_deduct_amount: '2048.00', settle_status: '打款完成', cny_settle_amount: '516156.22'}
-        ],
+        rowData: [],
         operations: [
           {
             className: 'red',
@@ -170,11 +128,12 @@
         this.$refs[form].validate((valid) => {
           if(valid) {
             const rate = this.rateForm.rate;
+            let cnySettleAmountTrial;
             this.rowData.forEach((item, i) => {
-              item.expectSettleAmountTrial = (item.expectSettleAmount / rate).toFixed(2);
               item.supplierAmountTrial = (item.supplierAmount * rate).toFixed(2);
-              item.priceDifferenceRMB = (item.expectSettleAmount - item.supplierAmountTrial).toFixed(2);
-              item.priceDifferenceNZD = (item.expectSettleAmountTrial - item.supplierAmount).toFixed(2);
+              item.priceDifferenceRMB = (item.cny_settle_amount - item.supplierAmountTrial).toFixed(2);
+              cnySettleAmountTrial = (item.cny_settle_amount / rate).toFixed(2);
+              item.priceDifferenceNZD = (cnySettleAmountTrial - supplierAmount).toFixed(2);
             });
             this.headers[9].active = true;
             this.headers[12].active = true;
@@ -183,18 +142,84 @@
           }
         });
       },
-      getTrade() {
-
+      getSupplierList(val, callback) {
+        axios.post('/supplier/getByName', {name: val}).then((res) => {
+          if(res.code === 0) {
+            res.data.forEach((item, i) => {
+              item.value = item.name;
+            });
+            this.suppliers = res.data;
+            callback(this.suppliers);
+          }
+        });
       },
-      searchSubmit() {
-
+      setSupplier(item) {
+        this.searchForm.supplierCode = item.code;
+        this.getMfwBill();
       },
-      onSubmit(){
-
+      changePage(val) {
+        this.page.currentPage = val;
+        this.getMfwBill();
       },
-      changePage() {
-
+      getMfwBill() {
+        if(this.searchForm.beginNo && !this.searchForm.endNo) {
+          Message.error('请输入结束订单ID');
+          return;
+        }
+        if(!this.searchForm.beginNo && this.searchForm.endNo) {
+          Message.error('请输入开始订单ID');
+          return;
+        }
+        if(!this.searchForm.invoiceDate) {
+          this.searchForm.invoiceDate = '';
+        }
+        if(!this.searchForm.dueDate) {
+          this.searchForm.dueDate = '';
+        }
+        if(!this.searchForm.goDate) {
+          this.searchForm.goDate = '';
+        }
+        const {beginNo, endNo, supplierCode, invoiceNumber, invoiceDate, dueDate, bookPeopleName, goDate, ctsNo} = this.searchForm;
+        axios.post('/finance/income/getMfwBill', {
+          pageNo: this.page.currentPage,
+          beginNo, endNo, supplierCode, invoiceNumber, invoiceDate, dueDate, bookPeopleName, goDate, ctsNo
+        }).then((res) => {
+          if(res.code === 0) {
+            this.page.pageCount = res.data.pageCount;
+            this.page.total = res.data.count;
+            this.rowData = [];
+            res.data.list.forEach((item, i) => {
+              this.rowData.push(item);
+            })
+          } else {
+            Message.error('加载失败');
+          }
+        })
+      },
+      exportIncome() {
+        if(this.searchForm.beginNo && !this.searchForm.endNo) {
+          Message.error('请输入结束订单ID');
+          return;
+        }
+        if(!this.searchForm.beginNo && this.searchForm.endNo) {
+          Message.error('请输入开始订单ID');
+          return;
+        }
+        if(!this.searchForm.invoiceDate) {
+          this.searchForm.invoiceDate = '';
+        }
+        if(!this.searchForm.dueDate) {
+          this.searchForm.dueDate = '';
+        }
+        if(!this.searchForm.goDate) {
+          this.searchForm.goDate = '';
+        }
+        const {beginNo, endNo, invoiceNumber, supplierCode, invoiceDate, dueDate, bookPeopleName, goDate, ctsNo} = this.searchForm;
+        window.location.href = window._server + `/export/exportIncome?beginNo=${beginNo}&endNo=${endNo}&invoiceNumber=${invoiceNumber}&supplierCode=${supplierCode}&invoiceDate=${invoiceDate}&dueDate=${dueDate}&bookPeopleName=${bookPeopleName}&goDate=${goDate}&ctsNo=${ctsNo}`;
       }
+    },
+    created() {
+      this.getMfwBill();
     },
     mounted() {
       if(this.$route.path === '/financial/mafengwo') {
@@ -206,7 +231,5 @@
   }
 </script>
 <style>
-.el-form-item__label{
-  min-width:80px;
-}
+
 </style>

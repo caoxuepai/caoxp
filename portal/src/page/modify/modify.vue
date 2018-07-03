@@ -90,6 +90,7 @@
                 this.ruleForm2.pass = '';
                 this.ruleForm2.newPass = '';
                 Message.success('修改成功');
+                this.$router.push({path:'/'});
               } else {
                 Message.warning('修改失败');
               }
